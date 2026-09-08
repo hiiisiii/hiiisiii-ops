@@ -1,0 +1,33 @@
+name: hiiisiii executor
+description: Prepare, execute, or finalize one hiiisiii task request
+
+inputs:
+  mode:
+    description: prepare, execute, or finalize
+    required: true
+  github_token:
+    description: GitHub token used only by trusted prepare/finalize control phases
+    required: false
+  trusted_actor:
+    description: Expected GitHub actor for defense-in-depth validation during prepare
+    required: false
+  control_file:
+    description: Prepared control file path for execute
+    required: false
+  result_file:
+    description: Result file path for finalize
+    required: false
+
+outputs:
+  should_execute:
+    description: true when prepare accepted the request
+  checkout_sha:
+    description: Validated Git commit SHA to checkout before execute
+  control_file:
+    description: Prepared control file path
+  result_file:
+    description: Result file path
+
+runs:
+  using: node24
+  main: src/action/index.js
