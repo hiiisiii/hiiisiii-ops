@@ -1,0 +1,60 @@
+name: hiiisiii task
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: hiiisiii-task-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  execute:
+    # This gate runs before a job is assigned to the self-hosted runner.
+    if: >-
+      github.event.repository.private == true &&
+      github.actor == vars.HIIISIII_TRUSTED_ACTOR &&
+      startsWith(github.event.issue.title, '[hiiisiii]')
+    # Reuse the target repository's existing suitable self-hosted runner.
+    # During setup, add only existing labels when they are needed to select the intended runner.
+    # Do not require a new hiiisiii-specific runner label solely for hiiisiii-ops.
+    runs-on: [self-hosted]
+    timeout-minutes: 20
+
+    steps:
+      - name: Prepare trusted request
+        id: prepare
+        uses: hiiisiii/hiiisiii-ops@<PINNED_FULL_SHA>
+        with:
+          mode: prepare
+          github_token: ${{ github.token }}
+          trusted_actor: ${{ vars.HIIISIII_TRUSTED_ACTOR }}
+
+      - name: Checkout validated commit
+        if: steps.prepare.outputs.should_execute == 'true'
+        uses: actions/checkout@<PINNED_FULL_SHA>
+        with:
+          ref: ${{ steps.prepare.outputs.checkout_sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Execute task without repository token input
+        if: steps.prepare.outputs.should_execute == 'true'
+        id: task
+        uses: hiiisiii/hiiisiii-ops@<PINNED_FULL_SHA>
+        with:
+          mode: execute
+          control_file: ${{ steps.prepare.outputs.control_file }}
+          result_file: ${{ steps.prepare.outputs.result_file }}
+
+      - name: Publish trusted result
+        if: always() && steps.prepare.outputs.result_file != ''
+        uses: hiiisiii/hiiisiii-ops@<PINNED_FULL_SHA>
+        with:
+          mode: finalize
+          github_token: ${{ github.token }}
+          result_file: ${{ steps.prepare.outputs.result_file }}
