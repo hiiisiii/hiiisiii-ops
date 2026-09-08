@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hiiisiii.dev/contracts/result-v1.schema.json",
+  "title": "hiiisiii.result.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "request_id", "sequence", "operation", "status", "target_id", "run_id", "base_sha", "task_branch", "head_sha", "commands", "changed_files", "artifact", "error_code"],
+  "properties": {
+    "schema": {"const": "hiiisiii.result.v1"},
+    "request_id": {"type": ["string", "null"]},
+    "sequence": {"type": ["integer", "null"], "minimum": 1},
+    "operation": {"type": ["string", "null"], "enum": ["inspect", "apply", "verify", null]},
+    "status": {"enum": ["success", "failed", "rejected"]},
+    "target_id": {"type": ["string", "null"]},
+    "run_id": {"type": "string"},
+    "base_sha": {"type": ["string", "null"]},
+    "task_branch": {"type": ["string", "null"]},
+    "head_sha": {"type": ["string", "null"]},
+    "commands": {"type": "array"},
+    "changed_files": {"type": "array", "items": {"type": "string"}},
+    "artifact": {"type": ["string", "null"]},
+    "error_code": {"type": ["string", "null"]}
+  }
+}
