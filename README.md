@@ -93,9 +93,9 @@ Existing tools and working configuration should be reused whenever possible.
 
 ### 5. Verify before using
 
-Setup is complete only after the current hiiisiii-ops health check verifies the actual execution path.
+Setup is complete only after the canonical [`setup/HEALTH_CHECK.md`](setup/HEALTH_CHECK.md) verifies the actual execution path.
 
-Creating files or configuring a workflow alone is not enough evidence that the runner path works.
+The v0.1 health check is a real read-only hiiisiii Task Session that verifies the Chat AI → GitHub Issue → GitHub Actions → self-hosted runner → Issue result path. Creating files or configuring a workflow alone is not enough evidence that the runner path works.
 
 Once the setup is verified as **READY**, continue using your normal Chat AI conversation for actual project requests.
 
@@ -121,6 +121,6 @@ hiiisiii-ops should inspect only what is needed, reuse existing implementations 
 
 ## Current development state
 
-The public-facing repository structure, workflow/executor implementation, health check, installer/onboarding automation, and release security boundary are still being finalized for v0.1.
+The workflow/executor implementation, installer/onboarding automation, and release security boundary are still being finalized and verified for v0.1.
 
-The canonical Chat AI setup handoff is already defined in [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md).
+The canonical Chat AI setup handoff is defined in [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md), and the canonical read-only setup verification contract is defined in [`setup/HEALTH_CHECK.md`](setup/HEALTH_CHECK.md).
