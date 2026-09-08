@@ -61,7 +61,7 @@ The Issue may contain a short human-readable summary, followed by exactly one cu
 
 Generate a new UUID for `request_id`. Resolve the target repository's actual default branch and use it as `base_ref`.
 
-```text
+````text
 Setup health check for hiiisiii-ops v0.1.
 
 <!-- HIIISIII_TASK_REQUEST_BEGIN -->
@@ -92,7 +92,7 @@ Setup health check for hiiisiii-ops v0.1.
 }
 ```
 <!-- HIIISIII_TASK_REQUEST_END -->
-```
+````
 
 Do not add extra commands merely because runner access is available.
 
