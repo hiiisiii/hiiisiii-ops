@@ -106,11 +106,13 @@ If it cannot, tell the user exactly what must be done and then verify the result
 
 ### 4. Verify the execution path
 
-Run the current hiiisiii-ops health check or setup verification documented by the version being installed.
+Read and follow [`setup/HEALTH_CHECK.md`](HEALTH_CHECK.md).
 
-The verification must provide real evidence that the configured path is working. Do not infer runner readiness from configuration files alone.
+Use that canonical read-only Task Session to verify the actual Chat AI → GitHub → Actions → self-hosted runner → result path.
 
-If the current version does not provide the required health-check mechanism, report **HOLD** rather than inventing an unofficial replacement and calling the setup complete.
+Do not infer runner readiness from configuration files alone and do not substitute a different ad hoc probe while calling the setup complete.
+
+If the canonical health check cannot be performed or verified, report **HOLD** with the smallest verified missing condition.
 
 ### 5. Finish or hold
 
@@ -125,7 +127,7 @@ The setup may be reported as **READY** only when all conditions required by the 
 - the target repository is known and accessible
 - required hiiisiii-ops repository-side files/configuration are present
 - a suitable self-hosted runner is actually available to the target repository
-- the required GitHub execution path has been verified with the current health check
+- the canonical health check completed successfully with matching evidence
 - no material project-instruction conflict remains unresolved
 
 Do not treat file creation alone as proof that the execution path works.
@@ -139,7 +141,7 @@ Use **HOLD** when, for example:
 - no suitable runner is available to the target repository
 - required GitHub permissions are missing
 - a required repository setting cannot be verified
-- the health check has not completed successfully
+- the canonical health check has not completed successfully
 - a material project-instruction conflict remains unresolved
 
 State the exact missing condition and the smallest next action required.
