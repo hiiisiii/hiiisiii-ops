@@ -40,7 +40,7 @@ The Task/Result protocol and setup handoff are provider-neutral.
 
 - ChatGPT is the currently verified end-to-end Chat AI path.
 - Claude, Gemini, and other Chat AI environments can use the same core protocol when they can perform the required GitHub repository/Issue operations or guide the user through the minimal missing GitHub action.
-- Other providers are not individually certified in v0.1.0.
+- Other providers have not been individually verified end to end in v0.1.0.
 
 No Claude Code, Codex CLI, Gemini CLI, or other local AI coding agent is required by hiiisiii-ops.
 
@@ -53,7 +53,7 @@ A deployment should select either:
 - a restricted non-root runner account without non-interactive privilege escalation and without unnecessary access to unrelated credentials/workloads, or
 - a dedicated/sufficiently isolated runner host or VM.
 
-This is a READY precondition for each user's deployment environment. hiiisiii-ops documents and checks the boundary during setup, but the project release does not centrally certify every user's PC, server, NAS, or VM.
+This is a READY precondition for each user's deployment environment. hiiisiii-ops documents and checks the boundary during setup, but the project release does not centrally validate every user's PC, server, NAS, or VM.
 
 ## Onboarding
 
