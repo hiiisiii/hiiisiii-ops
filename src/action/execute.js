@@ -1,23 +1,8 @@
 'use strict';
 
-const { execFileSync } = require('child_process');
 const { ProtocolError, recoverIdentity } = require('../executor/protocol');
-const { runCommands } = require('../executor/execution');
+const { ExecutionError, runCommands, applyPatchAndCommit, git } = require('../executor/execution');
 const { readJson, writeJson, setOutput } = require('./io');
-
-function git(args, cwd) {
-  return execFileSync('git', args, {
-    cwd,
-    encoding: 'utf8',
-    env: {
-      PATH: process.env.PATH,
-      HOME: process.env.HOME,
-      USERPROFILE: process.env.USERPROFILE,
-      SystemRoot: process.env.SystemRoot,
-    },
-    windowsHide: true,
-  }).trim();
-}
 
 function changedFiles(cwd) {
   const output = git(['status', '--porcelain'], cwd);
@@ -45,8 +30,8 @@ async function execute() {
     if (control.schema !== 'hiiisiii.control.v1') {
       throw new ProtocolError('INVALID_SCHEMA', 'Unsupported prepared control schema.', recoverIdentity(request));
     }
-    if (request.operation !== 'inspect') {
-      throw new ProtocolError('INVALID_SCHEMA', 'Phase-1 prototype only executes operation=inspect.', recoverIdentity(request));
+    if (!['inspect', 'apply'].includes(request.operation)) {
+      throw new ProtocolError('INVALID_SCHEMA', 'Current v0.1 runtime executes inspect/apply; standalone verify is not implemented yet.', recoverIdentity(request));
     }
 
     const currentHead = git(['rev-parse', 'HEAD'], workspace);
@@ -54,16 +39,31 @@ async function execute() {
       throw new ProtocolError('STALE_BASE_SHA', 'Checked out SHA differs from prepared checkout SHA.', recoverIdentity(request));
     }
 
-    const commandResults = await runCommands(request.commands, workspace, request.workdir, request.output_limit);
-    const failed = commandResults.find((item) => item.exit_code !== 0);
-    result.commands = commandResults.map(({ error_code, ...item }) => item);
-    result.changed_files = changedFiles(workspace);
-    result.head_sha = git(['rev-parse', 'HEAD'], workspace);
-    result.status = failed ? 'failed' : 'success';
-    result.error_code = failed?.error_code ?? null;
+    if (request.operation === 'apply') {
+      const applied = await applyPatchAndCommit(
+        request,
+        workspace,
+        control.issue_number,
+        control.task_branch,
+        control.checkout_sha,
+      );
+      result = { ...result, ...applied };
+    } else {
+      const commandResults = await runCommands(request.commands, workspace, request.workdir, request.output_limit);
+      const failed = commandResults.find((item) => item.exit_code !== 0);
+      result.commands = commandResults.map(({ error_code, ...item }) => item);
+      result.changed_files = changedFiles(workspace);
+      result.task_branch = control.task_branch_sha ? control.task_branch : null;
+      result.head_sha = git(['rev-parse', 'HEAD'], workspace);
+      result.status = failed ? 'failed' : 'success';
+      result.error_code = failed?.error_code ?? null;
+    }
   } catch (error) {
     if (error instanceof ProtocolError) {
       result = { ...result, ...error.partial, status: 'rejected', error_code: error.code };
+    } else if (error instanceof ExecutionError) {
+      result.status = 'failed';
+      result.error_code = error.code;
     } else {
       result.status = 'failed';
       result.error_code = error.code === 'PATH_OUTSIDE_ROOT' ? 'PATH_OUTSIDE_ROOT' : 'INTERNAL_ERROR';

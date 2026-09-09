@@ -8,7 +8,12 @@ const {
   analyzeHistory,
   recoverIdentity,
 } = require('../executor/protocol');
-const { listIssueComments, resolveCommitSha } = require('../executor/github');
+const {
+  listIssueComments,
+  resolveCommitSha,
+  resolveOptionalBranchSha,
+  taskBranchName,
+} = require('../executor/github');
 const { setOutput, writeJson } = require('./io');
 
 const RESULT_ACTOR = 'github-actions[bot]';
@@ -30,6 +35,26 @@ function resultTemplate(partial = {}) {
     artifact: null,
     error_code: null,
   };
+}
+
+function latestTaskBranchResult(accepted, taskBranch) {
+  return [...accepted]
+    .filter((item) => item?.task_branch === taskBranch && typeof item?.head_sha === 'string')
+    .sort((a, b) => (b.sequence || 0) - (a.sequence || 0))[0] || null;
+}
+
+function selectCheckoutSha(history, taskBranch, branchSha, canonicalBase) {
+  const latest = latestTaskBranchResult(history.accepted, taskBranch);
+  if (branchSha && !latest) {
+    throw new ProtocolError('STALE_BASE_SHA', 'Task branch exists without accepted task history.');
+  }
+  if (!branchSha && latest) {
+    throw new ProtocolError('STALE_BASE_SHA', 'Accepted task history references a missing task branch.');
+  }
+  if (branchSha && latest && latest.head_sha !== branchSha) {
+    throw new ProtocolError('STALE_BASE_SHA', 'Remote task branch differs from the latest accepted task result.');
+  }
+  return branchSha || canonicalBase;
 }
 
 async function prepare() {
@@ -65,17 +90,21 @@ async function prepare() {
     const comments = await listIssueComments(token, repository, issue.number);
     const history = analyzeHistory(comments, request, RESULT_ACTOR);
 
-    const resolvedBase = await resolveCommitSha(token, repository, request.base_ref);
+    let canonicalBase;
     if (request.sequence === 1) {
-      if (request.base_sha !== null && request.base_sha !== resolvedBase) {
+      canonicalBase = await resolveCommitSha(token, repository, request.base_ref);
+      if (request.base_sha !== null && request.base_sha !== canonicalBase) {
         throw new ProtocolError('STALE_BASE_SHA', 'sequence 1 base_sha does not match base_ref.', recoverIdentity(request));
       }
-      result.base_sha = resolvedBase;
-      checkoutSha = resolvedBase;
     } else {
-      result.base_sha = history.canonicalBase;
-      checkoutSha = history.canonicalBase || '';
+      canonicalBase = history.canonicalBase;
     }
+    result.base_sha = canonicalBase;
+
+    const taskBranch = taskBranchName(issue.number);
+    const needsTaskState = request.operation !== 'inspect' || request.sequence > 1;
+    const branchSha = needsTaskState ? await resolveOptionalBranchSha(token, repository, taskBranch) : null;
+    checkoutSha = selectCheckoutSha(history, taskBranch, branchSha, canonicalBase);
 
     const control = {
       schema: 'hiiisiii.control.v1',
@@ -83,6 +112,8 @@ async function prepare() {
       issue_number: issue.number,
       result_actor: RESULT_ACTOR,
       checkout_sha: checkoutSha,
+      task_branch: taskBranch,
+      task_branch_sha: branchSha,
       request,
     };
     writeJson(controlFile, control);
@@ -99,7 +130,6 @@ async function prepare() {
       throw error;
     }
   } finally {
-    // Keep repository credentials out of later execute-mode process inputs/outputs.
     delete process.env.INPUT_GITHUB_TOKEN;
     setOutput('should_execute', shouldExecute ? 'true' : 'false');
     setOutput('checkout_sha', checkoutSha);
@@ -108,4 +138,4 @@ async function prepare() {
   }
 }
 
-module.exports = { prepare, resultTemplate, RESULT_ACTOR };
+module.exports = { prepare, resultTemplate, RESULT_ACTOR, latestTaskBranchResult, selectCheckoutSha };
