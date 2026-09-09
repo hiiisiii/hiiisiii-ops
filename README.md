@@ -4,7 +4,7 @@ Connect the Chat AI you already use to GitHub and your own execution environment
 
 hiiisiii-ops is not a new IDE and does not require a separate local AI coding agent. The reasoning, planning, and code generation stay in ChatGPT, Claude, Gemini, or another supported chat AI environment. Your PC or server is used as the execution environment.
 
-> **Status:** v0.1 Local/Linux release baseline is complete. The core Local task path has been validated end to end on a private repository with a Linux self-hosted runner, the Linux-first bootstrap/onboarding path is implemented, and the runner security boundary is documented. Runner isolation remains a per-deployment READY precondition for each user's execution environment; it is not a requirement that hiiisiii-ops certify every user's machine before the project itself can be released.
+> **Status:** v0.1 Local/Linux release baseline is complete. The core Local task path has been validated end to end on a private repository with a Linux self-hosted runner, the Linux-first bootstrap/onboarding path is implemented, and the runner security boundary is documented. Runner isolation remains a per-deployment READY precondition for each user's execution environment; it is not a requirement that hiiisiii-ops centrally validate every user's machine before the project itself can be released.
 
 ## How it works
 
@@ -49,16 +49,16 @@ The verified v0.1 core path is intentionally small:
 - deterministic task branches for mutation state
 - existing project instructions
 
-The Linux requirement applies to the **self-hosted execution runner**, not to the device where you use ChatGPT, Claude, Gemini, or GitHub. You can use a normal Windows, macOS, or Linux client to talk to your Chat AI while the actual project work runs on a Linux self-hosted runner.
+v0.1 uses a **Linux self-hosted runner as the execution environment**. This does not restrict the device where you use ChatGPT, Claude, Gemini, GitHub, or your IDE: the client side may be Windows, macOS, or Linux.
 
-Windows and macOS **runner** execution, SSH Remote execution, and public target repositories are not v0.1 READY support claims yet.
+SSH Remote remains an optional Advanced execution direction for users who want the runner to hand work off to another server. The current v0.1 release validates the Local execution path only. Public target repositories and Windows/macOS execution runners are likewise outside the current v0.1 READY claim.
 
 ### Chat AI compatibility
 
 The core protocol and setup handoff are provider-neutral.
 
 - **ChatGPT:** the currently verified end-to-end Chat AI path.
-- **Claude / Gemini / other Chat AIs:** compatible when the selected Chat AI environment can perform the required GitHub repository and Issue operations, or can guide the user through the minimal missing GitHub action. These providers are not individually certified in v0.1.
+- **Claude / Gemini / other Chat AIs:** compatible when the selected Chat AI environment can perform the required GitHub repository and Issue operations, or can guide the user through the minimal missing GitHub action. These providers have not been individually verified end to end in v0.1.
 
 hiiisiii-ops does not require provider-specific local coding agents to bridge those differences.
 
@@ -97,7 +97,7 @@ A healthy runner is not considered suitable merely because it can execute Action
 
 If an existing runner fails this boundary, do not automatically modify the user's working environment. The default remediation is to create or select a restricted runner account on the existing Linux host while leaving existing workloads/runners intact. Use a dedicated isolated host/VM only when account-level isolation on the existing host cannot provide a sufficient boundary. If multiple runners can match the repository, use an explicit routing label when necessary so hiiisiii tasks select only the intended restricted runner; runner labels are routing controls, not trusted-actor security gates.
 
-This security check is a deployment/setup responsibility for the selected runner. hiiisiii-ops documents the boundary and can guide the setup, but it does not claim to centrally certify every user's PC, server, NAS, or VM.
+This security check is a deployment/setup responsibility for the selected runner. hiiisiii-ops documents the boundary and can guide the setup, but it does not claim to centrally validate every user's PC, server, NAS, or VM.
 
 Do not paste runner registration tokens, PATs, SSH private keys, API keys, or other secrets into a Chat AI conversation.
 
@@ -165,4 +165,4 @@ The runner OS-account/host isolation boundary has been identified and documented
 
 ChatGPT is the verified Chat AI path. The core Task/Result protocol and [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md) remain provider-neutral so Claude, Gemini, and other capable Chat AI environments can use the same setup contract without changing the core executor.
 
-See [`RELEASE_NOTES.md`](RELEASE_NOTES.md) for the v0.1 release scope and exclusions.
+See [`RELEASE_NOTES.md`](RELEASE_NOTES.md) for the v0.1 release scope and execution boundary.
