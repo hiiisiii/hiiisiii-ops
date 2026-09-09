@@ -1,6 +1,6 @@
 # hiiisiii-ops v0.1.1
 
-Release status: prepared for publication
+Release date: 2026-09-10
 
 ## Status
 
