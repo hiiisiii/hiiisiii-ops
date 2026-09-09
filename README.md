@@ -4,6 +4,8 @@ Connect the Chat AI you already use to GitHub and your own execution environment
 
 hiiisiii-ops is not a new IDE and does not require a separate local AI coding agent. The reasoning, planning, and code generation stay in ChatGPT, Claude, Gemini, or another supported chat AI environment. Your PC or server is used as the execution environment.
 
+> **Use the Chat AI you already have and the compute you already own.** hiiisiii-ops does not require a second local AI coding agent or a separate cloud execution worker, helping avoid unnecessary additional agent and hosted-compute usage. Your normal Chat AI plan, message, and model usage still applies.
+
 > **Status:** v0.1 Local/Linux release baseline is complete. The core Local task path has been validated end to end on a private repository with a Linux self-hosted runner, the Linux-first bootstrap/onboarding path is implemented, and the runner security boundary is documented. Runner isolation remains a per-deployment READY precondition for each user's execution environment; it is not a requirement that hiiisiii-ops centrally validate every user's machine before the project itself can be released.
 
 ## How it works
@@ -51,7 +53,7 @@ The verified v0.1 core path is intentionally small:
 
 v0.1 uses a **Linux self-hosted runner as the execution environment**. This does not restrict the device where you use ChatGPT, Claude, Gemini, GitHub, or your IDE: the client side may be Windows, macOS, or Linux.
 
-SSH Remote remains an optional Advanced execution direction for users who want the runner to hand work off to another server. The current v0.1 release validates the Local execution path only. Public target repositories and Windows/macOS execution runners are likewise outside the current v0.1 READY claim.
+For server-hosted projects, the simplest supported model is to install or reuse the self-hosted runner on the server that actually runs the project. hiiisiii-ops still treats this as Local execution even if you personally access that server over SSH. A runner-to-SSH-to-different-host transport remains a deferred Advanced direction and is not required for the current v0.1 READY path. Public target repositories and Windows/macOS execution runners are likewise outside the current v0.1 READY claim.
 
 ### Chat AI compatibility
 
@@ -87,6 +89,8 @@ It does **not** install packages, register or re-register a runner, modify GitHu
 `HANDOFF_READY` means the local diagnostic collected enough context to continue setup in your Chat AI. It does **not** mean the repository is fully READY; final readiness requires the canonical health check and a verified runner security boundary.
 
 If the target repository already has a suitable working runner, reuse it. Do not install or register another runner just because you are setting up hiiisiii-ops. A local runner process or config file alone is not proof that the runner is usable by the target repository or safe for hiiisiii task execution.
+
+If the project itself runs on a server, prefer reusing or connecting a suitable self-hosted runner on that execution server instead of adding an SSH hop solely for hiiisiii-ops.
 
 For v0.1 Local/Linux, the selected execution runner must satisfy at least one of these security strategies:
 
