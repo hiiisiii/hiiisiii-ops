@@ -177,6 +177,18 @@ function assertClean(cwd) {
   }
 }
 
+function restorePreApplyState(cwd, taskBranch, checkoutSha, expectedPaths) {
+  git(['checkout', '-B', taskBranch, checkoutSha], cwd);
+  git(['reset', '--hard', checkoutSha], cwd);
+  if (expectedPaths.length > 0) {
+    try {
+      git(['clean', '-f', '--', ...expectedPaths], cwd);
+    } catch {
+      // The next checkout still receives an exact validated SHA; cleanup here is best-effort and path-bounded.
+    }
+  }
+}
+
 function restoreIntendedState(cwd, taskBranch, headSha) {
   git(['checkout', '-B', taskBranch, headSha], cwd);
   git(['reset', '--hard', headSha], cwd);
@@ -187,41 +199,47 @@ async function applyPatchAndCommit(request, projectRoot, issueNumber, taskBranch
   const expectedPaths = extractPatchPaths(request.patch, projectRoot);
   git(['checkout', '-B', taskBranch, checkoutSha], projectRoot);
 
+  let intendedHead;
   try {
-    gitRaw(['apply', '--check', '-'], projectRoot, request.patch);
-  } catch {
-    throw new ExecutionError('PATCH_REJECTED', 'Patch does not apply cleanly to the selected task state.');
-  }
-  try {
-    gitRaw(['apply', '-'], projectRoot, request.patch);
-  } catch {
-    throw new ExecutionError('PATCH_REJECTED', 'Patch application failed.');
-  }
+    try {
+      gitRaw(['apply', '--check', '-'], projectRoot, request.patch);
+    } catch {
+      throw new ExecutionError('PATCH_REJECTED', 'Patch does not apply cleanly to the selected task state.');
+    }
+    try {
+      gitRaw(['apply', '-'], projectRoot, request.patch);
+    } catch {
+      throw new ExecutionError('PATCH_REJECTED', 'Patch application failed.');
+    }
 
-  const actualPaths = workingTreeFiles(projectRoot);
-  if (!samePaths(actualPaths, expectedPaths)) {
-    throw new ExecutionError('PATCH_REJECTED', 'Applied files differ from patch-declared files.');
-  }
+    const actualPaths = workingTreeFiles(projectRoot);
+    if (!samePaths(actualPaths, expectedPaths)) {
+      throw new ExecutionError('PATCH_REJECTED', 'Applied files differ from patch-declared files.');
+    }
 
-  git(['add', '-A', '--', ...expectedPaths], projectRoot);
-  const stagedPaths = zPaths(gitRaw(['diff', '--cached', '--name-only', '-z', '--no-renames'], projectRoot)).map(validatePatchPath);
-  if (!samePaths(stagedPaths, expectedPaths)) {
-    throw new ExecutionError('PATCH_REJECTED', 'Staged files differ from intended patch files.');
-  }
+    git(['add', '-A', '--', ...expectedPaths], projectRoot);
+    const stagedPaths = zPaths(gitRaw(['diff', '--cached', '--name-only', '-z', '--no-renames'], projectRoot)).map(validatePatchPath);
+    if (!samePaths(stagedPaths, expectedPaths)) {
+      throw new ExecutionError('PATCH_REJECTED', 'Staged files differ from intended patch files.');
+    }
 
-  git(['config', '--local', 'user.name', 'hiiisiii-ops'], projectRoot);
-  git(['config', '--local', 'user.email', 'hiiisiii-ops@users.noreply.github.com'], projectRoot);
-  try {
-    git([
-      '-c', 'core.hooksPath=.git/hiiisiii-no-hooks',
-      'commit', '--no-gpg-sign', '--no-verify',
-      '-m', `hiiisiii task #${issueNumber} seq ${request.sequence}`,
-    ], projectRoot);
-  } catch {
-    throw new ExecutionError('PATCH_REJECTED', 'Intended patch could not be committed.');
-  }
+    git(['config', '--local', 'user.name', 'hiiisiii-ops'], projectRoot);
+    git(['config', '--local', 'user.email', 'hiiisiii-ops@users.noreply.github.com'], projectRoot);
+    try {
+      git([
+        '-c', 'core.hooksPath=.git/hiiisiii-no-hooks',
+        'commit', '--no-gpg-sign', '--no-verify',
+        '-m', `hiiisiii task #${issueNumber} seq ${request.sequence}`,
+      ], projectRoot);
+    } catch {
+      throw new ExecutionError('PATCH_REJECTED', 'Intended patch could not be committed.');
+    }
 
-  const intendedHead = git(['rev-parse', 'HEAD'], projectRoot);
+    intendedHead = git(['rev-parse', 'HEAD'], projectRoot);
+  } catch (error) {
+    restorePreApplyState(projectRoot, taskBranch, checkoutSha, expectedPaths);
+    throw error;
+  }
   const commandResults = await runCommands(request.commands, projectRoot, request.workdir, request.output_limit);
   const failedCommand = commandResults.find((item) => item.exit_code !== 0);
   const postVerifyHead = git(['rev-parse', 'HEAD'], projectRoot);
