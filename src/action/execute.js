@@ -2,6 +2,7 @@
 
 const { ProtocolError, recoverIdentity } = require('../executor/protocol');
 const { ExecutionError, runCommands, applyPatchAndCommit, git } = require('../executor/execution');
+const { verifyCheckedOutState } = require('../executor/verification');
 const { readJson, writeJson, setOutput } = require('./io');
 
 function changedFiles(cwd) {
@@ -30,8 +31,8 @@ async function execute() {
     if (control.schema !== 'hiiisiii.control.v1') {
       throw new ProtocolError('INVALID_SCHEMA', 'Unsupported prepared control schema.', recoverIdentity(request));
     }
-    if (!['inspect', 'apply'].includes(request.operation)) {
-      throw new ProtocolError('INVALID_SCHEMA', 'Current v0.1 runtime executes inspect/apply; standalone verify is not implemented yet.', recoverIdentity(request));
+    if (!['inspect', 'apply', 'verify'].includes(request.operation)) {
+      throw new ProtocolError('INVALID_SCHEMA', 'Current v0.1 runtime executes inspect/apply/verify.', recoverIdentity(request));
     }
 
     const currentHead = git(['rev-parse', 'HEAD'], workspace);
@@ -48,6 +49,14 @@ async function execute() {
         control.checkout_sha,
       );
       result = { ...result, ...applied };
+    } else if (request.operation === 'verify') {
+      const verified = await verifyCheckedOutState(
+        request,
+        workspace,
+        control.checkout_sha,
+        control.task_branch_sha ? control.task_branch : null,
+      );
+      result = { ...result, ...verified };
     } else {
       const commandResults = await runCommands(request.commands, workspace, request.workdir, request.output_limit);
       const failed = commandResults.find((item) => item.exit_code !== 0);
