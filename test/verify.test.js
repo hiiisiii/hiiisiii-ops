@@ -6,7 +6,9 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const { validateTask } = require('../src/executor/protocol');
 const { verifyCheckedOutState } = require('../src/executor/verification');
+const { selectCheckoutSha } = require('../src/action/prepare');
 
 function git(args, cwd) {
   return execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
@@ -36,6 +38,43 @@ function request(commands) {
     output_limit: 12000,
   };
 }
+
+function verifyTask(overrides = {}) {
+  return {
+    schema: 'hiiisiii.task.v1',
+    request_id: '550e8400-e29b-41d4-a716-446655440000',
+    sequence: 1,
+    operation: 'verify',
+    target_id: 'local',
+    base_ref: 'main',
+    base_sha: null,
+    workdir: '.',
+    commands: [],
+    patch: null,
+    output_limit: 12000,
+    ...overrides,
+  };
+}
+
+test('verify contract rejects patch input', () => {
+  assert.throws(() => validateTask(verifyTask({ patch: 'not allowed' })), (error) => error.code === 'PATCH_NOT_ALLOWED');
+});
+
+test('verify task-state selection uses verified branch head or canonical base', () => {
+  const branch = 'hiiisiii/task-42';
+  const base = 'a'.repeat(40);
+  const branchHead = 'b'.repeat(40);
+  assert.equal(selectCheckoutSha({ accepted: [] }, branch, null, base), base);
+  assert.equal(
+    selectCheckoutSha({ accepted: [{ sequence: 1, task_branch: branch, head_sha: branchHead }] }, branch, branchHead, base),
+    branchHead,
+  );
+});
+
+test('finalize push guard remains apply-only', () => {
+  const source = fs.readFileSync(path.join(__dirname, '..', 'src', 'action', 'finalize.js'), 'utf8');
+  assert.match(source, /result\.operation === 'apply' && result\.task_branch && result\.head_sha/);
+});
 
 test('verify succeeds without source mutation and reports selected base state', async () => {
   const { root, head } = repo();
