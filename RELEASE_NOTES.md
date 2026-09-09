@@ -71,7 +71,7 @@ The bootstrap is intentionally non-destructive and does not automatically instal
 
 This release verifies the Local execution path on a Linux self-hosted runner and private target repositories.
 
-SSH Remote remains an optional Advanced execution direction in the hiiisiii-ops design, but it is not part of the v0.1.0 READY path yet. Public target repositories and Windows/macOS execution runners are also outside the current READY claim.
+Public target repositories and Windows/macOS execution runners are outside the current READY claim.
 
 These execution boundaries do not restrict the user's client device. Windows, macOS, or Linux may be used to access the Chat AI, GitHub, the project, or the user's normal development environment.
 
