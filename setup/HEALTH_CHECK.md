@@ -32,16 +32,24 @@ It must not:
 
 It only verifies the minimum GitHub-to-runner task/result loop.
 
+## Current support boundary
+
+The currently verified v0.1 core path is a private GitHub project repository using a self-hosted Linux runner and the Local execution target.
+
+Do not use this health check to claim READY support for Windows, macOS, SSH Remote execution, or public target repositories unless a later hiiisiii-ops version explicitly documents and verifies that path.
+
 ## Preconditions
 
 Before starting the health check, verify the minimum required setup for the current v0.1 version:
 
 - the target repository is known and accessible
 - the target repository is private
-- the current hiiisiii task workflow is installed in the target repository
-- the repository is configured with the required trusted actor identity
+- the current hiiisiii task workflow is installed in the target repository using the documented immutable Action pins
+- repository Actions variable `HIIISIII_TRUSTED_ACTOR` exists and its value is the exact GitHub actor identity expected to create or edit the hiiisiii task Issue
 - a suitable self-hosted runner is actually available to the target repository
 - the runner can execute the current hiiisiii workflow requirements
+
+`HIIISIII_TRUSTED_ACTOR` is an actor identity, not a secret. Never substitute a PAT, token, runner registration token, or other credential for this value.
 
 Reuse existing working configuration. Do not reinstall or re-register a runner when the target repository already has a suitable one.
 
@@ -102,7 +110,7 @@ A successful probe provides evidence that:
 
 1. the current Chat AI can publish the required GitHub task request
 2. the Issue event reaches the configured hiiisiii workflow
-3. the trusted-actor gate allows the intended task identity
+3. the `HIIISIII_TRUSTED_ACTOR` job-level gate allows the intended `github.actor`
 4. GitHub assigns the job to a suitable self-hosted runner
 5. the runner receives a validated checkout of the target repository
 6. the executor can run the read-only request
@@ -140,8 +148,8 @@ Report **HOLD** when the end-to-end probe cannot be verified.
 Examples:
 
 - no workflow run is created
+- the job is skipped because `HIIISIII_TRUSTED_ACTOR` is missing or does not match the Issue event actor
 - the job remains queued because no matching runner is available
-- the trusted-actor gate does not allow the Issue event
 - the request is rejected by the protocol
 - a command fails or times out
 - no matching result comment is published
