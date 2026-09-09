@@ -23,6 +23,8 @@ async function finalize() {
     } catch (error) {
       result.status = 'failed';
       result.error_code = error.code === 'STALE_BASE_SHA' ? 'STALE_BASE_SHA' : 'INTERNAL_ERROR';
+      result.task_branch = null;
+      result.head_sha = null;
       writeJson(resultFile, result);
     }
   }
