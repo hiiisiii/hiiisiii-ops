@@ -137,7 +137,30 @@ Setup is complete only after the runner security boundary is verified and the ca
 
 The v0.1 health check is a real read-only hiiisiii Task Session that verifies the Chat AI → GitHub Issue → GitHub Actions → self-hosted runner → Issue result path. Creating files or configuring a workflow alone is not enough evidence that the runner path works, and a successful health check alone does not prove that the runner OS account or host is safely isolated.
 
-Once the setup is verified as **READY**, continue using your normal Chat AI conversation for actual project requests.
+Once setup is verified as **READY**, have the Chat AI read and follow the canonical [`CHAT_AI_EXECUTION.md`](CHAT_AI_EXECUTION.md) for normal project work. In the same setup conversation, the user should then be able to make ordinary natural-language project requests without pasting a separate hiiisiii prompt for every task.
+
+### 6. Use hiiisiii-ops after READY
+
+If your project already has a persistent instruction source such as `AGENTS.md`, `CLAUDE.md`, a Chat AI project instruction, or a connected project-specific Drive instruction, you can add this stable reference once so later project chats can rediscover the execution contract:
+
+```text
+For real project execution through hiiisiii-ops, follow https://github.com/hiiisiii/hiiisiii-ops/blob/main/CHAT_AI_EXECUTION.md.
+```
+
+This does not replace your existing project rules, and hiiisiii-ops does not require a new project-prompt format.
+
+If a completely new chat has no persistent project context, use the minimal one-time handoff below:
+
+```text
+Use hiiisiii-ops for this project.
+Read and follow:
+https://github.com/hiiisiii/hiiisiii-ops/blob/main/CHAT_AI_EXECUTION.md
+
+Target repository:
+https://github.com/<owner>/<repository>
+```
+
+You should not need to repeat that handoff for every task in the same project context.
 
 ## Project instructions
 
@@ -167,6 +190,6 @@ The Linux-first bootstrap diagnostic is implemented and locally behavior-validat
 
 The runner OS-account/host isolation boundary has been identified and documented, including an actual unsafe-runner probe and a successful restricted-account boundary check. Whether a particular user's selected runner satisfies that boundary is a deployment READY condition for that environment, not a blocker on publishing the v0.1 project itself.
 
-ChatGPT is the verified Chat AI path. The core Task/Result protocol and [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md) remain provider-neutral so Claude, Gemini, and other capable Chat AI environments can use the same setup contract without changing the core executor.
+ChatGPT is the verified Chat AI path. The core Task/Result protocol, [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md), and [`CHAT_AI_EXECUTION.md`](CHAT_AI_EXECUTION.md) remain provider-neutral so Claude, Gemini, and other capable Chat AI environments can use the same contracts without changing the core executor.
 
 See [`RELEASE_NOTES.md`](RELEASE_NOTES.md) for the v0.1 release scope and execution boundary.
