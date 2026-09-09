@@ -4,7 +4,7 @@ Connect the Chat AI you already use to GitHub and your own execution environment
 
 hiiisiii-ops is not a new IDE and does not require a separate local AI coding agent. The reasoning, planning, and code generation stay in ChatGPT, Claude, Gemini, or another supported chat AI environment. Your PC or server is used as the execution environment.
 
-> **Status:** v0.1 developer preview. The core Local task path has been validated end to end on a private repository with a Linux self-hosted runner. Public onboarding/bootstrap automation is still being completed. Do not treat the current repository as a production-ready release yet.
+> **Status:** v0.1 developer preview. The core Local task path has been validated end to end on a private repository with a Linux self-hosted runner. A Linux-first bootstrap diagnostic is now available; clean onboarding E2E and release-boundary verification are still being completed. Do not treat the current repository as a production-ready release yet.
 
 ## How it works
 
@@ -59,21 +59,29 @@ Use the GitHub repository where you want the Chat AI to perform real project wor
 
 For the current v0.1 prototype, use a **private project repository**.
 
-### 2. Prepare the execution environment
+### 2. Run the Linux bootstrap diagnostic
 
-Your project needs access to a GitHub Actions self-hosted runner on the PC or server that will perform the work.
+Clone the public hiiisiii-ops repository and run the diagnostic with your target project repository:
 
-If the target repository already has a suitable working runner, reuse it. Do not install or register another runner just because you are setting up hiiisiii-ops.
+```bash
+git clone https://github.com/hiiisiii/hiiisiii-ops.git
+cd hiiisiii-ops
+bash setup/bootstrap.sh --target <owner/repository>
+```
 
-If the repository does not yet have a usable runner, follow GitHub's official self-hosted runner setup for that repository.
+The bootstrap script is intentionally non-destructive. It detects the Linux/architecture and local Git state, reports whether the optional GitHub CLI is present, checks only limited local self-hosted-runner signals, resolves the target repository, and prints the canonical Chat AI setup handoff.
 
-The first bootstrap automation is being built Linux-first. Until it is published, the current setup path is the manual/Chat-AI-assisted path documented below.
+It does **not** install packages, register or re-register a runner, modify GitHub repositories, manage your existing project clone, install project runtimes, or change project source.
+
+`HANDOFF_READY` means the local diagnostic collected enough context to continue setup in your Chat AI. It does **not** mean the repository is fully READY; final readiness requires the canonical health check.
+
+If the target repository already has a suitable working runner, reuse it. Do not install or register another runner just because you are setting up hiiisiii-ops. A local runner process or config file alone is not proof that the runner is usable by the target repository.
 
 Do not paste runner registration tokens, PATs, SSH private keys, API keys, or other secrets into a Chat AI conversation.
 
 ### 3. Continue setup in your Chat AI
 
-Open the ChatGPT, Claude, Gemini, or other supported chat AI environment you normally use and send:
+Use the handoff text printed by `setup/bootstrap.sh`, or open the ChatGPT, Claude, Gemini, or other supported chat AI environment you normally use and send:
 
 ```text
 Continue the hiiisiii-ops setup.
@@ -129,4 +137,4 @@ hiiisiii-ops should inspect only what is needed, reuse existing implementations 
 
 The core private-repository Local workflow/executor path has actual self-hosted E2E evidence for read-only inspection, apply/task-branch mutation, standalone verification, stale-base rejection, and unexpected tracked-mutation isolation.
 
-The remaining v0.1 release work is primarily public onboarding/bootstrap and release-boundary completion. The canonical Chat AI setup handoff is defined in [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md), and the canonical read-only setup verification contract is defined in [`setup/HEALTH_CHECK.md`](setup/HEALTH_CHECK.md).
+The Linux-first bootstrap diagnostic is implemented, but a clean onboarding E2E and the runner OS-account/isolation release boundary still need final verification before v0.1 Local/Linux is called release-ready. The canonical Chat AI setup handoff is defined in [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md), and the canonical read-only setup verification contract is defined in [`setup/HEALTH_CHECK.md`](setup/HEALTH_CHECK.md).
