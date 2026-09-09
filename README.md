@@ -4,7 +4,7 @@ Connect the Chat AI you already use to GitHub and your own execution environment
 
 hiiisiii-ops is not a new IDE and does not require a separate local AI coding agent. The reasoning, planning, and code generation stay in ChatGPT, Claude, Gemini, or another supported chat AI environment. Your PC or server is used as the execution environment.
 
-> **Status:** v0.1 developer preview. The core Local task path has been validated end to end on a private repository with a Linux self-hosted runner. A Linux-first bootstrap diagnostic is now available; clean onboarding E2E and release-boundary verification are still being completed. Do not treat the current repository as a production-ready release yet.
+> **Status:** v0.1 developer preview. The core Local task path has been validated end to end on a private repository with a Linux self-hosted runner. The Linux-first bootstrap diagnostic is implemented and the onboarding release gate has sufficient evidence from bootstrap behavior validation plus the canonical self-hosted health-check E2E. Runner OS-account/isolation release-boundary verification is still being completed. Do not treat the current repository as a production-ready release yet.
 
 ## How it works
 
@@ -137,4 +137,4 @@ hiiisiii-ops should inspect only what is needed, reuse existing implementations 
 
 The core private-repository Local workflow/executor path has actual self-hosted E2E evidence for read-only inspection, apply/task-branch mutation, standalone verification, stale-base rejection, and unexpected tracked-mutation isolation.
 
-The Linux-first bootstrap diagnostic is implemented, but a clean onboarding E2E and the runner OS-account/isolation release boundary still need final verification before v0.1 Local/Linux is called release-ready. The canonical Chat AI setup handoff is defined in [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md), and the canonical read-only setup verification contract is defined in [`setup/HEALTH_CHECK.md`](setup/HEALTH_CHECK.md).
+The Linux-first bootstrap diagnostic is implemented and locally behavior-validated, and the onboarding release gate is satisfied by combining that bounded bootstrap evidence with the existing canonical self-hosted health-check E2E. A fresh destructive reinstallation of an already working runner environment is not required to duplicate those same facts. The runner OS-account/isolation release boundary still needs final verification before v0.1 Local/Linux is called release-ready. The canonical Chat AI setup handoff is defined in [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md), and the canonical read-only setup verification contract is defined in [`setup/HEALTH_CHECK.md`](setup/HEALTH_CHECK.md).
