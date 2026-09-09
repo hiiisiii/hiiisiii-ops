@@ -4,7 +4,7 @@ Connect the Chat AI you already use to GitHub and your own execution environment
 
 hiiisiii-ops is not a new IDE and does not require a separate local AI coding agent. The reasoning, planning, and code generation stay in ChatGPT, Claude, Gemini, or another supported chat AI environment. Your PC or server is used as the execution environment.
 
-> **Status:** v0.1 developer preview. The core workflow and onboarding path are still being completed and verified. Do not treat the current repository as a production-ready release yet.
+> **Status:** v0.1 developer preview. The core Local task path has been validated end to end on a private repository with a Linux self-hosted runner. Public onboarding/bootstrap automation is still being completed. Do not treat the current repository as a production-ready release yet.
 
 ## How it works
 
@@ -38,16 +38,18 @@ No Claude Code, Codex CLI, Gemini CLI, or other local AI coding agent is require
 
 ## v0.1 scope
 
-The first supported path is intentionally small:
+The current verified core path is intentionally small:
 
-- GitHub project repository
+- private GitHub project repository
 - GitHub Actions
-- self-hosted runner
-- local execution target
-- Chat AI ↔ GitHub task/result loop
+- self-hosted Linux runner
+- Local execution target
+- Chat AI ↔ GitHub Issue task/result loop
+- `inspect`, `apply`, and standalone `verify` operations
+- deterministic task branches for mutation state
 - existing project instructions
 
-SSH remote execution, broader public-project support, and installer automation are later steps.
+The first public bootstrap/onboarding target is Linux. Windows, macOS, SSH Remote execution, and public target repositories are not READY support claims for v0.1 yet.
 
 ## Quick Start
 
@@ -64,6 +66,8 @@ Your project needs access to a GitHub Actions self-hosted runner on the PC or se
 If the target repository already has a suitable working runner, reuse it. Do not install or register another runner just because you are setting up hiiisiii-ops.
 
 If the repository does not yet have a usable runner, follow GitHub's official self-hosted runner setup for that repository.
+
+The first bootstrap automation is being built Linux-first. Until it is published, the current setup path is the manual/Chat-AI-assisted path documented below.
 
 Do not paste runner registration tokens, PATs, SSH private keys, API keys, or other secrets into a Chat AI conversation.
 
@@ -88,6 +92,8 @@ If your Chat AI cannot access the GitHub file directly, copy the contents of [`s
 ### 4. Follow only the remaining setup steps
 
 The Chat AI may be able to perform repository-side setup directly through its GitHub integration. If it cannot perform a required action, it should give you the smallest exact GitHub UI step or command needed and then verify the resulting state before continuing.
+
+For the current v0.1 workflow, the target repository also needs the repository Actions variable `HIIISIII_TRUSTED_ACTOR`. Its value must be the exact GitHub actor identity expected to create or edit hiiisiii task Issues. The setup handoff verifies this rather than asking you to paste any secret.
 
 Existing tools and working configuration should be reused whenever possible.
 
@@ -121,6 +127,6 @@ hiiisiii-ops should inspect only what is needed, reuse existing implementations 
 
 ## Current development state
 
-The workflow/executor implementation, installer/onboarding automation, and release security boundary are still being finalized and verified for v0.1.
+The core private-repository Local workflow/executor path has actual self-hosted E2E evidence for read-only inspection, apply/task-branch mutation, standalone verification, stale-base rejection, and unexpected tracked-mutation isolation.
 
-The canonical Chat AI setup handoff is defined in [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md), and the canonical read-only setup verification contract is defined in [`setup/HEALTH_CHECK.md`](setup/HEALTH_CHECK.md).
+The remaining v0.1 release work is primarily public onboarding/bootstrap and release-boundary completion. The canonical Chat AI setup handoff is defined in [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md), and the canonical read-only setup verification contract is defined in [`setup/HEALTH_CHECK.md`](setup/HEALTH_CHECK.md).

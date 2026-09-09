@@ -28,7 +28,7 @@ jobs:
     steps:
       - name: Prepare trusted request
         id: prepare
-        uses: hiiisiii/hiiisiii-ops@<PINNED_FULL_SHA>
+        uses: hiiisiii/hiiisiii-ops@bab0bfa30f970023581bc06feaa8fa9f9e68c2b6
         with:
           mode: prepare
           github_token: ${{ github.token }}
@@ -36,7 +36,7 @@ jobs:
 
       - name: Checkout validated commit
         if: steps.prepare.outputs.should_execute == 'true'
-        uses: actions/checkout@<PINNED_FULL_SHA>
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ steps.prepare.outputs.checkout_sha }}
           fetch-depth: 1
@@ -45,7 +45,7 @@ jobs:
       - name: Execute task without repository token input
         if: steps.prepare.outputs.should_execute == 'true'
         id: task
-        uses: hiiisiii/hiiisiii-ops@<PINNED_FULL_SHA>
+        uses: hiiisiii/hiiisiii-ops@bab0bfa30f970023581bc06feaa8fa9f9e68c2b6
         with:
           mode: execute
           control_file: ${{ steps.prepare.outputs.control_file }}
@@ -53,7 +53,7 @@ jobs:
 
       - name: Publish trusted result
         if: always() && steps.prepare.outputs.result_file != ''
-        uses: hiiisiii/hiiisiii-ops@<PINNED_FULL_SHA>
+        uses: hiiisiii/hiiisiii-ops@bab0bfa30f970023581bc06feaa8fa9f9e68c2b6
         with:
           mode: finalize
           github_token: ${{ github.token }}

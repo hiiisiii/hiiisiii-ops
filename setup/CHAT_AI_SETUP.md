@@ -21,6 +21,17 @@ Do not require a separate local AI coding agent such as Claude Code, Codex CLI, 
 
 > Minimum work. Sufficient evidence. Verified result.
 
+## Current v0.1 support boundary
+
+The currently verified core path is:
+
+- private GitHub project repository
+- GitHub Actions
+- self-hosted Linux runner
+- Local execution target
+
+The first public bootstrap/onboarding target is Linux. Do not report Windows, macOS, SSH Remote execution, or public target repositories as READY support unless a later hiiisiii-ops version explicitly documents and verifies them.
+
 ## Required input
 
 Identify the target GitHub repository from the user's message or current chat context.
@@ -48,7 +59,7 @@ Do not ask for information that can be discovered from the available GitHub or p
    - Do not claim a step is complete when you cannot verify it.
 
 4. **Do not reinstall existing tools without evidence that it is necessary.**
-   - Prefer existing Git, GitHub configuration, runner installation, project clone, and native platform capabilities.
+   - Prefer existing Git, GitHub configuration, runner installation, and native platform capabilities.
    - Do not install project runtimes, dependencies, containers, or unrelated tools as part of hiiisiii-ops setup unless the current project explicitly requires them for the setup verification being performed.
 
 5. **Protect secrets.**
@@ -82,17 +93,23 @@ Follow only the steps that are still necessary.
 
 Confirm the target repository and the GitHub account/context available to the current Chat AI.
 
+For the current v0.1 prototype, the target repository must be private.
+
 ### 2. Inspect the current setup state
 
 Check, to the extent the current environment allows:
 
-- repository accessibility
+- repository accessibility and private visibility
 - existing hiiisiii-ops files or workflow
+- whether `.github/workflows/hiiisiii-task.yml` uses the current published pinned Action SHAs
+- whether the repository Actions variable `HIIISIII_TRUSTED_ACTOR` is configured for the exact GitHub actor identity expected to create or edit hiiisiii task Issues
 - whether the target repository has access to a suitable self-hosted runner
 - the minimum repository settings needed by the current hiiisiii-ops version
 - relevant project instructions
 
 Do not perform broad repository scans just because repository access is available.
+
+Do not treat a runner config file or workflow file alone as proof that a runner is healthy.
 
 ### 3. Apply only missing repository-side setup
 
@@ -100,9 +117,17 @@ Use the current hiiisiii-ops release files and documented configuration as the s
 
 Prefer the smallest change that makes the target repository ready.
 
-If the current Chat AI can make the change directly, make it and verify it.
+For the current v0.1 workflow, repository-side setup includes, when missing:
 
-If it cannot, tell the user exactly what must be done and then verify the result before moving on.
+- installing/updating `.github/workflows/hiiisiii-task.yml` from the published hiiisiii-ops workflow template without replacing its immutable Action pins with floating branches or tags
+- configuring repository Actions variable `HIIISIII_TRUSTED_ACTOR` to the exact GitHub actor identity expected to create or edit hiiisiii task Issues
+- adding only existing runner labels that are actually necessary to select the intended self-hosted runner; do not create a hiiisiii-specific label solely for hiiisiii-ops
+
+`HIIISIII_TRUSTED_ACTOR` is not a secret. Do not replace it with a PAT, token, or credential. Its purpose is to make the job-level trust gate compare `github.actor` against the explicitly configured task actor before assigning the self-hosted runner.
+
+If the current Chat AI can make the required changes directly, make them and verify them.
+
+If it cannot configure the repository Actions variable or another required GitHub setting, tell the user the smallest exact GitHub UI step or command needed and then verify the resulting state before moving on.
 
 ### 4. Verify the execution path
 
@@ -124,8 +149,9 @@ Report **HOLD** when a required capability, permission, runner connection, repos
 
 The setup may be reported as **READY** only when all conditions required by the current hiiisiii-ops version are satisfied and verified, including at minimum:
 
-- the target repository is known and accessible
-- required hiiisiii-ops repository-side files/configuration are present
+- the target repository is known, accessible, and private
+- required hiiisiii-ops repository-side files/configuration are present with the documented immutable Action pins
+- `HIIISIII_TRUSTED_ACTOR` is configured for the expected task actor
 - a suitable self-hosted runner is actually available to the target repository
 - the canonical health check completed successfully with matching evidence
 - no material project-instruction conflict remains unresolved
@@ -137,7 +163,9 @@ Do not treat file creation alone as proof that the execution path works.
 Use **HOLD** when, for example:
 
 - the target repository is unknown
+- the target repository is not private for the current v0.1 path
 - the current Chat AI cannot perform a required GitHub action and the user has not completed the required manual step
+- `HIIISIII_TRUSTED_ACTOR` is missing or does not match the actor producing the task Issue event
 - no suitable runner is available to the target repository
 - required GitHub permissions are missing
 - a required repository setting cannot be verified
