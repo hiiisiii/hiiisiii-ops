@@ -53,7 +53,7 @@ function taskBranchName(issueNumber) {
 }
 
 async function resolveOptionalBranchSha(token, repository, branch) {
-  const encoded = encodeURIComponent(branch);
+  const encoded = branch.split('/').map(encodeURIComponent).join('/');
   const response = await fetch(`${apiBase()}/repos/${repository}/git/ref/heads/${encoded}`, { headers: headers(token) });
   if (response.status === 404) return null;
   if (!response.ok) throw new Error(`GitHub branch resolve failed: ${response.status}`);
