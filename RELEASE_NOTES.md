@@ -1,16 +1,16 @@
-# hiiisiii-ops v0.1
+# hiiisiii-ops v0.1.0
 
 Release date: 2026-09-10
 
 ## Status
 
-v0.1 is the first public Local/Linux release baseline for hiiisiii-ops.
+v0.1.0 is the first public Local/Linux release baseline for hiiisiii-ops.
 
 The release provides a provider-neutral Chat AI → GitHub → self-hosted runner → project work → GitHub result path without requiring a separate local AI coding agent.
 
 ## Verified core
 
-The v0.1 core has actual self-hosted end-to-end evidence for:
+The v0.1.0 core has actual self-hosted end-to-end evidence for:
 
 - GitHub Issue-based Task Sessions
 - trusted-actor pre-gate before self-hosted runner assignment
@@ -24,7 +24,7 @@ The v0.1 core has actual self-hosted end-to-end evidence for:
 - canonical read-only setup health check
 - Linux-first bootstrap behavior
 
-## Supported v0.1 execution scope
+## Supported v0.1.0 execution scope
 
 - private GitHub project repositories
 - repository-level self-hosted runners
@@ -32,7 +32,7 @@ The v0.1 core has actual self-hosted end-to-end evidence for:
 - Local execution on the runner machine
 - existing project instructions such as `AGENTS.md`, `CLAUDE.md`, repository documentation, or a connected project-specific instruction source
 
-The Linux limitation applies to the execution runner. The user may access ChatGPT, Claude, Gemini, GitHub, or the project from a normal Windows, macOS, or Linux client.
+The v0.1.0 execution environment is a Linux self-hosted runner. The device used to access ChatGPT, Claude, Gemini, GitHub, the project, or an IDE may be Windows, macOS, or Linux.
 
 ## Chat AI compatibility
 
@@ -40,7 +40,7 @@ The Task/Result protocol and setup handoff are provider-neutral.
 
 - ChatGPT is the currently verified end-to-end Chat AI path.
 - Claude, Gemini, and other Chat AI environments can use the same core protocol when they can perform the required GitHub repository/Issue operations or guide the user through the minimal missing GitHub action.
-- Other providers are not individually certified in v0.1.
+- Other providers are not individually certified in v0.1.0.
 
 No Claude Code, Codex CLI, Gemini CLI, or other local AI coding agent is required by hiiisiii-ops.
 
@@ -67,18 +67,13 @@ The public repository provides:
 
 The bootstrap is intentionally non-destructive and does not automatically install project runtimes, re-register working runners, modify live project clones, or collect plaintext secrets.
 
-## Not included in v0.1 READY support
+## v0.1.0 release boundary
 
-- Windows self-hosted runner execution
-- macOS self-hosted runner execution
-- SSH Remote execution
-- public target repositories
-- provider-by-provider certification beyond the verified ChatGPT path
-- automatic PR or merge
-- a hiiisiii-specific test/lint/build policy
-- a separate local AI coding-agent runtime
+This release verifies the Local execution path on a Linux self-hosted runner and private target repositories.
 
-These are follow-up compatibility or feature areas, not missing requirements for the v0.1 Local/Linux release baseline.
+SSH Remote remains an optional Advanced execution direction in the hiiisiii-ops design, but it is not part of the v0.1.0 READY path yet. Public target repositories and Windows/macOS execution runners are also outside the current READY claim.
+
+These execution boundaries do not restrict the user's client device. Windows, macOS, or Linux may be used to access the Chat AI, GitHub, the project, or the user's normal development environment.
 
 ## Operating principle
 
