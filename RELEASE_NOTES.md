@@ -1,3 +1,30 @@
+# hiiisiii-ops v0.1.1
+
+Release status: prepared for publication
+
+## Status
+
+v0.1.1 is a backward-compatible documentation and usage-flow patch on top of the verified v0.1.0 Local/Linux runtime baseline.
+
+It does not change executor behavior, the Task/Result protocol, JSON schemas, workflow template, or bootstrap behavior.
+
+## What changed
+
+- Added root `CHAT_AI_EXECUTION.md` as the canonical provider-neutral handoff for normal project work after setup is READY.
+- Connected `setup/CHAT_AI_SETUP.md` and `README.md` so the same Chat AI conversation can continue with ordinary natural-language project requests after READY without requiring a separate hiiisiii prompt for every task.
+- Documented the minimal persistent-project-context reference and the one-time fallback for a completely independent new chat.
+- Clarified the public value proposition: reuse the Chat AI and compute you already have without requiring a separate local AI coding agent or cloud execution worker. Normal Chat AI plan, message, and model usage still applies.
+- Clarified the supported Local model for server-hosted projects: when the self-hosted runner and project execution environment are on the same machine, it is Local execution.
+- Kept public documentation focused on the currently supported and verified execution scope.
+
+## Runtime compatibility
+
+v0.1.1 keeps the v0.1.0 runtime and protocol baseline unchanged.
+
+The existing v0.1.0 self-hosted end-to-end evidence remains applicable. No new runtime capability is claimed by this patch.
+
+---
+
 # hiiisiii-ops v0.1.0
 
 Release date: 2026-09-10
