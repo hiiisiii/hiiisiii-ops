@@ -49,9 +49,9 @@ The verified v0.1 core path is intentionally small:
 - deterministic task branches for mutation state
 - existing project instructions
 
-The Linux requirement applies to the **self-hosted execution runner**, not to the device where you use ChatGPT, Claude, Gemini, or GitHub. You can use a normal Windows, macOS, or Linux client to talk to your Chat AI while the actual project work runs on a Linux self-hosted runner.
+v0.1 uses a **Linux self-hosted runner as the execution environment**. This does not restrict the device where you use ChatGPT, Claude, Gemini, GitHub, or your IDE: the client side may be Windows, macOS, or Linux.
 
-Windows and macOS **runner** execution, SSH Remote execution, and public target repositories are not v0.1 READY support claims yet.
+SSH Remote remains an optional Advanced execution direction for users who want the runner to hand work off to another server. The current v0.1 release validates the Local execution path only. Public target repositories and Windows/macOS execution runners are likewise outside the current v0.1 READY claim.
 
 ### Chat AI compatibility
 
@@ -165,4 +165,4 @@ The runner OS-account/host isolation boundary has been identified and documented
 
 ChatGPT is the verified Chat AI path. The core Task/Result protocol and [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md) remain provider-neutral so Claude, Gemini, and other capable Chat AI environments can use the same setup contract without changing the core executor.
 
-See [`RELEASE_NOTES.md`](RELEASE_NOTES.md) for the v0.1 release scope and exclusions.
+See [`RELEASE_NOTES.md`](RELEASE_NOTES.md) for the v0.1 release scope and execution boundary.
