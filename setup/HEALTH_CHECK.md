@@ -43,7 +43,9 @@ The selected runner must satisfy at least one supported isolation strategy:
 - **Restricted account:** a non-root runner account that cannot gain privileged/root access non-interactively, uses a separated HOME/workspace, and does not have unnecessary access to unrelated credentials, personal files, or sensitive workloads.
 - **Isolated host:** a dedicated or sufficiently single-purpose PC/server/VM without unrelated sensitive workloads, credentials, or unnecessary production access.
 
-Do not use this health check to claim READY support for Windows, macOS, SSH Remote execution, or public target repositories unless a later hiiisiii-ops version explicitly documents and verifies that path.
+This health-check boundary applies to the execution runner, not to the device used to access ChatGPT, Claude, Gemini, GitHub, or the project. Client devices may be Windows, macOS, or Linux.
+
+Do not use this health check to claim READY support for Windows or macOS execution runners, SSH Remote execution, or public target repositories unless a later hiiisiii-ops version explicitly documents and verifies that path.
 
 ## Preconditions
 
