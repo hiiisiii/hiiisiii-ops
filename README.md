@@ -4,7 +4,7 @@ Connect the Chat AI you already use to GitHub and your own execution environment
 
 hiiisiii-ops is not a new IDE and does not require a separate local AI coding agent. The reasoning, planning, and code generation stay in ChatGPT, Claude, Gemini, or another supported chat AI environment. Your PC or server is used as the execution environment.
 
-> **Status:** v0.1 developer preview. The core Local task path has been validated end to end on a private repository with a Linux self-hosted runner. The Linux-first bootstrap diagnostic is implemented and the onboarding release gate has sufficient evidence from bootstrap behavior validation plus the canonical self-hosted health-check E2E. The runner OS-account/isolation policy is now defined, but v0.1 Local/Linux is not release-ready until the selected execution runner is verified to satisfy that security boundary. Do not treat the current repository as a production-ready release yet.
+> **Status:** v0.1 Local/Linux release baseline is complete. The core Local task path has been validated end to end on a private repository with a Linux self-hosted runner, the Linux-first bootstrap/onboarding path is implemented, and the runner security boundary is documented. Runner isolation remains a per-deployment READY precondition for each user's execution environment; it is not a requirement that hiiisiii-ops certify every user's machine before the project itself can be released.
 
 ## How it works
 
@@ -38,7 +38,7 @@ No Claude Code, Codex CLI, Gemini CLI, or other local AI coding agent is require
 
 ## v0.1 scope
 
-The current verified core path is intentionally small:
+The verified v0.1 core path is intentionally small:
 
 - private GitHub project repository
 - GitHub Actions
@@ -49,7 +49,18 @@ The current verified core path is intentionally small:
 - deterministic task branches for mutation state
 - existing project instructions
 
-The first public bootstrap/onboarding target is Linux. Windows, macOS, SSH Remote execution, and public target repositories are not READY support claims for v0.1 yet.
+The Linux requirement applies to the **self-hosted execution runner**, not to the device where you use ChatGPT, Claude, Gemini, or GitHub. You can use a normal Windows, macOS, or Linux client to talk to your Chat AI while the actual project work runs on a Linux self-hosted runner.
+
+Windows and macOS **runner** execution, SSH Remote execution, and public target repositories are not v0.1 READY support claims yet.
+
+### Chat AI compatibility
+
+The core protocol and setup handoff are provider-neutral.
+
+- **ChatGPT:** the currently verified end-to-end Chat AI path.
+- **Claude / Gemini / other Chat AIs:** compatible when the selected Chat AI environment can perform the required GitHub repository and Issue operations, or can guide the user through the minimal missing GitHub action. These providers are not individually certified in v0.1.
+
+hiiisiii-ops does not require provider-specific local coding agents to bridge those differences.
 
 ## Quick Start
 
@@ -57,7 +68,7 @@ The first public bootstrap/onboarding target is Linux. Windows, macOS, SSH Remot
 
 Use the GitHub repository where you want the Chat AI to perform real project work.
 
-For the current v0.1 prototype, use a **private project repository**.
+For v0.1, use a **private project repository**.
 
 ### 2. Run the Linux bootstrap diagnostic
 
@@ -85,6 +96,8 @@ For v0.1 Local/Linux, the selected execution runner must satisfy at least one of
 A healthy runner is not considered suitable merely because it can execute Actions. For example, a general-purpose runner account with passwordless `sudo` and broad access to unrelated credentials/workloads does not meet the v0.1 READY security boundary.
 
 If an existing runner fails this boundary, do not automatically modify the user's working environment. The default remediation is to create or select a restricted runner account on the existing Linux host while leaving existing workloads/runners intact. Use a dedicated isolated host/VM only when account-level isolation on the existing host cannot provide a sufficient boundary. If multiple runners can match the repository, use an explicit routing label when necessary so hiiisiii tasks select only the intended restricted runner; runner labels are routing controls, not trusted-actor security gates.
+
+This security check is a deployment/setup responsibility for the selected runner. hiiisiii-ops documents the boundary and can guide the setup, but it does not claim to centrally certify every user's PC, server, NAS, or VM.
 
 Do not paste runner registration tokens, PATs, SSH private keys, API keys, or other secrets into a Chat AI conversation.
 
@@ -142,8 +155,14 @@ keep using them. hiiisiii-ops should discover and respect the relevant existing 
 
 hiiisiii-ops should inspect only what is needed, reuse existing implementations and tools first, make only the required changes, run directly relevant verification, and stop when the requested result has been sufficiently verified.
 
-## Current development state
+## v0.1 verification status
 
-The core private-repository Local workflow/executor path has actual self-hosted E2E evidence for read-only inspection, apply/task-branch mutation, standalone verification, stale-base rejection, and unexpected tracked-mutation isolation.
+The private-repository Local workflow/executor path has actual self-hosted E2E evidence for read-only inspection, apply/task-branch mutation, standalone verification, stale-base rejection, and unexpected tracked-mutation isolation.
 
-The Linux-first bootstrap diagnostic is implemented and locally behavior-validated, and the onboarding release gate is satisfied by combining that bounded bootstrap evidence with the existing canonical self-hosted health-check E2E. A fresh destructive reinstallation of an already working runner environment is not required to duplicate those same facts. The v0.1 runner security contract now requires a verified restricted-account or isolated-host boundary; remediation and verification of a conforming execution runner remain before v0.1 Local/Linux is called release-ready. The canonical Chat AI setup handoff is defined in [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md), and the canonical read-only setup verification contract is defined in [`setup/HEALTH_CHECK.md`](setup/HEALTH_CHECK.md).
+The Linux-first bootstrap diagnostic is implemented and locally behavior-validated. The onboarding release gate is satisfied by combining that bounded bootstrap evidence with the canonical self-hosted health-check E2E; a destructive fresh reinstall of an already working runner environment is not required to reproduce the same facts.
+
+The runner OS-account/host isolation boundary has been identified and documented, including an actual unsafe-runner probe and a successful restricted-account boundary check. Whether a particular user's selected runner satisfies that boundary is a deployment READY condition for that environment, not a blocker on publishing the v0.1 project itself.
+
+ChatGPT is the verified Chat AI path. The core Task/Result protocol and [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md) remain provider-neutral so Claude, Gemini, and other capable Chat AI environments can use the same setup contract without changing the core executor.
+
+See [`RELEASE_NOTES.md`](RELEASE_NOTES.md) for the v0.1 release scope and exclusions.
