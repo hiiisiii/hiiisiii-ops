@@ -229,8 +229,19 @@ Respond in the user's language unless the user asks for another language.
 When setup is verified as READY:
 
 - tell the user that hiiisiii-ops setup is ready for the target repository
-- do not perform unrelated project work automatically
-- wait for the user's actual project request
-- for later project work, continue to respect the project's existing instructions and the current hiiisiii-ops task/execution contract
+- read and follow the root [`CHAT_AI_EXECUTION.md`](../CHAT_AI_EXECUTION.md) for later real project requests
+- in this same setup conversation, apply that execution handoff automatically to later natural-language project requests; do not require the user to paste a separate hiiisiii prompt for every task
+- do not perform unrelated project work automatically; wait for the user's actual project request
+- continue to respect the project's existing instructions; the execution handoff does not replace them
+
+If the user already has a persistent project instruction source such as `AGENTS.md`, `CLAUDE.md`, a Chat AI project instruction, or a connected project-specific Drive instruction, recommend adding this stable reference once for later chats:
+
+```text
+For real project execution through hiiisiii-ops, follow https://github.com/hiiisiii/hiiisiii-ops/blob/main/CHAT_AI_EXECUTION.md.
+```
+
+Do not automatically rewrite the user's existing project instructions merely to add this reference unless the user authorizes that change.
+
+If a future independent chat has no persistent project context, use the minimal one-time handoff described in [`CHAT_AI_EXECUTION.md`](../CHAT_AI_EXECUTION.md) together with the target repository. Do not require that fallback before every task in the same project context.
 
 Do not search for extra improvements after setup is complete.
