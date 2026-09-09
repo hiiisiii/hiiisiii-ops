@@ -4,7 +4,7 @@ Connect the Chat AI you already use to GitHub and your own execution environment
 
 hiiisiii-ops is not a new IDE and does not require a separate local AI coding agent. The reasoning, planning, and code generation stay in ChatGPT, Claude, Gemini, or another supported chat AI environment. Your PC or server is used as the execution environment.
 
-> **Status:** v0.1 Local/Linux release baseline is complete. The core Local task path has been validated end to end on a private repository with a Linux self-hosted runner, the Linux-first bootstrap/onboarding path is implemented, and the runner security boundary is documented. Runner isolation remains a per-deployment READY precondition for each user's execution environment; it is not a requirement that hiiisiii-ops certify every user's machine before the project itself can be released.
+> **Status:** v0.1 Local/Linux release baseline is complete. The core Local task path has been validated end to end on a private repository with a Linux self-hosted runner, the Linux-first bootstrap/onboarding path is implemented, and the runner security boundary is documented. Runner isolation remains a per-deployment READY precondition for each user's execution environment; it is not a requirement that hiiisiii-ops centrally validate every user's machine before the project itself can be released.
 
 ## How it works
 
@@ -58,7 +58,7 @@ SSH Remote remains an optional Advanced execution direction for users who want t
 The core protocol and setup handoff are provider-neutral.
 
 - **ChatGPT:** the currently verified end-to-end Chat AI path.
-- **Claude / Gemini / other Chat AIs:** compatible when the selected Chat AI environment can perform the required GitHub repository and Issue operations, or can guide the user through the minimal missing GitHub action. These providers are not individually certified in v0.1.
+- **Claude / Gemini / other Chat AIs:** compatible when the selected Chat AI environment can perform the required GitHub repository and Issue operations, or can guide the user through the minimal missing GitHub action. These providers have not been individually verified end to end in v0.1.
 
 hiiisiii-ops does not require provider-specific local coding agents to bridge those differences.
 
@@ -97,7 +97,7 @@ A healthy runner is not considered suitable merely because it can execute Action
 
 If an existing runner fails this boundary, do not automatically modify the user's working environment. The default remediation is to create or select a restricted runner account on the existing Linux host while leaving existing workloads/runners intact. Use a dedicated isolated host/VM only when account-level isolation on the existing host cannot provide a sufficient boundary. If multiple runners can match the repository, use an explicit routing label when necessary so hiiisiii tasks select only the intended restricted runner; runner labels are routing controls, not trusted-actor security gates.
 
-This security check is a deployment/setup responsibility for the selected runner. hiiisiii-ops documents the boundary and can guide the setup, but it does not claim to centrally certify every user's PC, server, NAS, or VM.
+This security check is a deployment/setup responsibility for the selected runner. hiiisiii-ops documents the boundary and can guide the setup, but it does not claim to centrally validate every user's PC, server, NAS, or VM.
 
 Do not paste runner registration tokens, PATs, SSH private keys, API keys, or other secrets into a Chat AI conversation.
 
