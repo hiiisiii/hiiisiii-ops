@@ -59,7 +59,7 @@ The v0.1.0 core has actual self-hosted end-to-end evidence for:
 - Local execution on the runner machine
 - existing project instructions such as `AGENTS.md`, `CLAUDE.md`, repository documentation, or a connected project-specific instruction source
 
-The v0.1.0 execution environment is a Linux self-hosted runner. The device used to access ChatGPT, Claude, Gemini, GitHub, the project, or an IDE may be Windows, macOS, or Linux.
+The v0.1.0 execution environment is a Linux self-hosted runner.
 
 ## Chat AI compatibility
 
@@ -98,9 +98,7 @@ The bootstrap is intentionally non-destructive and does not automatically instal
 
 This release verifies the Local execution path on a Linux self-hosted runner and private target repositories.
 
-Public target repositories and Windows/macOS execution runners are outside the current READY claim.
-
-These execution boundaries do not restrict the user's client device. Windows, macOS, or Linux may be used to access the Chat AI, GitHub, the project, or the user's normal development environment.
+Public target repositories are outside the current READY claim.
 
 ## Operating principle
 
