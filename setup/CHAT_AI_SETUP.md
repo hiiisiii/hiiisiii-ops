@@ -30,7 +30,7 @@ The currently verified core path is:
 - self-hosted Linux runner
 - Local execution target
 
-The selected execution runner must also satisfy the v0.1 runner security boundary defined below. The first public bootstrap/onboarding target is Linux. This runner-OS boundary does not restrict the user's Chat AI client device; Windows, macOS, and Linux clients may be used. Do not report Windows or macOS execution runners or public target repositories as READY support unless a later hiiisiii-ops version explicitly documents and verifies them.
+The selected execution runner must also satisfy the v0.1 runner security boundary defined below. The first public bootstrap/onboarding target is Linux. Do not report unsupported execution environments or public target repositories as READY unless a later hiiisiii-ops version explicitly documents and verifies them.
 
 ## Required input
 

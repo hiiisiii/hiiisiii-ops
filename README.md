@@ -51,9 +51,9 @@ The verified v0.1 core path is intentionally small:
 - deterministic task branches for mutation state
 - existing project instructions
 
-v0.1 uses a **Linux self-hosted runner as the execution environment**. This does not restrict the device where you use ChatGPT, Claude, Gemini, GitHub, or your IDE: the client side may be Windows, macOS, or Linux.
+v0.1 uses a **Linux self-hosted runner as the execution environment**.
 
-For server-hosted projects, the simplest supported model is to install or reuse the self-hosted runner on the server that actually runs the project. hiiisiii-ops treats this as Local execution because the runner and project execution environment are on the same machine. Public target repositories and Windows/macOS execution runners are outside the current v0.1 READY claim.
+For server-hosted projects, the simplest supported model is to install or reuse the self-hosted runner on the server that actually runs the project. hiiisiii-ops treats this as Local execution because the runner and project execution environment are on the same machine. Public target repositories are outside the current v0.1 READY claim.
 
 ### Chat AI compatibility
 
