@@ -120,17 +120,17 @@ function validatePatchPath(value) {
 
 function extractPatchPaths(patch, cwd) {
   if (/^GIT binary patch$/m.test(patch) || /^Binary files /m.test(patch)) {
-    throw new ProtocolError('PATCH_REJECTED', 'Binary patches are not supported in the v0.1 prototype.');
+    throw new ProtocolError('PATCH_UNSUPPORTED', 'Binary patches are not supported in the v0.1 prototype.');
   }
   if (/^(rename|copy) (from|to) /m.test(patch)) {
-    throw new ProtocolError('PATCH_REJECTED', 'Rename/copy patches are not supported in the first mutation prototype.');
+    throw new ProtocolError('PATCH_UNSUPPORTED', 'Rename/copy patches are not supported in the first mutation prototype.');
   }
 
   let output;
   try {
     output = gitRaw(['apply', '--numstat', '-z', '-'], cwd, patch);
   } catch {
-    throw new ExecutionError('PATCH_REJECTED', 'Patch could not be parsed by git apply.');
+    throw new ExecutionError('PATCH_INVALID', 'Patch could not be parsed by git apply.');
   }
 
   const paths = [];
@@ -143,12 +143,12 @@ function extractPatchPaths(patch, cwd) {
     const added = record.slice(0, firstTab);
     const deleted = record.slice(firstTab + 1, secondTab);
     if (added === '-' || deleted === '-') {
-      throw new ProtocolError('PATCH_REJECTED', 'Binary patches are not supported in the v0.1 prototype.');
+      throw new ProtocolError('PATCH_UNSUPPORTED', 'Binary patches are not supported in the v0.1 prototype.');
     }
     paths.push(validatePatchPath(record.slice(secondTab + 1)));
   }
   if (paths.length === 0) {
-    throw new ExecutionError('PATCH_REJECTED', 'Patch contains no supported file changes.');
+    throw new ExecutionError('PATCH_INVALID', 'Patch contains no supported file changes.');
   }
   return sortedUnique(paths);
 }
@@ -204,7 +204,7 @@ async function applyPatchAndCommit(request, projectRoot, issueNumber, taskBranch
     try {
       gitRaw(['apply', '--check', '-'], projectRoot, request.patch);
     } catch {
-      throw new ExecutionError('PATCH_REJECTED', 'Patch does not apply cleanly to the selected task state.');
+      throw new ExecutionError('PATCH_CONTEXT_MISMATCH', 'Patch does not apply cleanly to the selected task state.');
     }
     try {
       gitRaw(['apply', '-'], projectRoot, request.patch);

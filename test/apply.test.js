@@ -9,6 +9,7 @@ const { execFileSync } = require('child_process');
 const {
   applyPatchAndCommit,
   validatePatchPath,
+  extractPatchPaths,
 } = require('../src/executor/execution');
 const { selectCheckoutSha } = require('../src/action/prepare');
 const { validateTaskBranchRef } = require('../src/executor/github');
@@ -49,6 +50,51 @@ function request(patch, commands = []) {
 test('patch path validation rejects traversal and Git metadata', () => {
   assert.throws(() => validatePatchPath('../escape.txt'), (error) => error.code === 'PATH_OUTSIDE_ROOT');
   assert.throws(() => validatePatchPath('.git/config'), (error) => error.code === 'PATH_OUTSIDE_ROOT');
+});
+
+
+test('malformed patch returns PATCH_INVALID', () => {
+  const { root } = repo();
+  assert.throws(
+    () => extractPatchPaths('not a diff\n', root),
+    (error) => error.code === 'PATCH_INVALID',
+  );
+});
+
+test('rename patch returns PATCH_UNSUPPORTED', () => {
+  const { root } = repo();
+  const patch = [
+    'diff --git a/target.txt b/renamed.txt',
+    'similarity index 100%',
+    'rename from target.txt',
+    'rename to renamed.txt',
+    '',
+  ].join('\n');
+  assert.throws(
+    () => extractPatchPaths(patch, root),
+    (error) => error.code === 'PATCH_UNSUPPORTED',
+  );
+});
+
+test('stale patch context returns PATCH_CONTEXT_MISMATCH and restores base state', async () => {
+  const { root, head } = repo();
+  const patch = [
+    'diff --git a/target.txt b/target.txt',
+    '--- a/target.txt',
+    '+++ b/target.txt',
+    '@@ -1 +1 @@',
+    '-missing',
+    '+after',
+    '',
+  ].join('\n');
+
+  await assert.rejects(
+    () => applyPatchAndCommit(request(patch), root, 16, 'hiiisiii/task-16', head),
+    (error) => error.code === 'PATCH_CONTEXT_MISMATCH',
+  );
+  assert.equal(git(['rev-parse', 'HEAD'], root), head);
+  assert.equal(fs.readFileSync(path.join(root, 'target.txt'), 'utf8'), 'before\n');
+  assert.equal(git(['status', '--porcelain', '--untracked-files=all'], root), '');
 });
 
 test('apply creates exactly one intended commit on deterministic task branch', async () => {
