@@ -57,10 +57,13 @@ For server-hosted projects, the simplest supported model is to install or reuse 
 
 ### Chat AI compatibility
 
-The core protocol and setup handoff are provider-neutral.
+The core protocol and setup handoff are provider-neutral. The transport path is selected from the GitHub capabilities that are actually available in the current Chat AI session:
 
-- **ChatGPT:** the currently verified end-to-end Chat AI path.
-- **Claude / Gemini / other Chat AIs:** compatible when the selected Chat AI environment can perform the required GitHub repository and Issue operations, or can guide the user through the minimal missing GitHub action. These providers have not been individually verified end to end in v0.1.
+- **Direct:** the Chat AI can create/update the task Issue and read/search the matching result through its GitHub integration.
+- **Assisted:** the Chat AI prepares the exact task request as a prefilled Issue URL or equivalent ready-to-submit body, and the user submits it while signed in as the configured `HIIISIII_TRUSTED_ACTOR`.
+- **Manual:** when the Chat AI also cannot read/search the private result, the user relays the unchanged request/result between GitHub and the Chat AI.
+
+Direct same-Issue execution and Assisted human-submit execution have both been verified against the same v1 Task/Result contract. A provider is not permanently assigned to one mode; use the least-manual path supported by the current session.
 
 hiiisiii-ops does not require provider-specific local coding agents to bridge those differences.
 
@@ -125,7 +128,7 @@ If your Chat AI cannot access the GitHub file directly, copy the contents of [`s
 
 ### 4. Follow only the remaining setup steps
 
-The Chat AI may be able to perform repository-side setup directly through its GitHub integration. If it cannot perform a required action, it should give you the smallest exact GitHub UI step or command needed and then verify the resulting state before continuing.
+The Chat AI may be able to perform repository-side setup directly through its GitHub integration. If direct GitHub write is unavailable, it should prefer the verified Assisted path: prepare the exact prefilled Issue URL or ready-to-submit body and ask you only to submit it as the configured trusted actor. If result read/search is also unavailable, use the same request/result contract through Manual relay. Use HOLD only when the required action or evidence cannot be completed through any of these bounded paths.
 
 For the current v0.1 workflow, the target repository also needs the repository Actions variable `HIIISIII_TRUSTED_ACTOR`. Its value must be the exact GitHub actor identity expected to create or edit hiiisiii task Issues. The setup handoff verifies this rather than asking you to paste any secret.
 
@@ -190,6 +193,6 @@ The Linux-first bootstrap diagnostic is implemented and locally behavior-validat
 
 The runner OS-account/host isolation boundary has been identified and documented, including an actual unsafe-runner probe and a successful restricted-account boundary check. Whether a particular user's selected runner satisfies that boundary is a deployment READY condition for that environment, not a blocker on publishing the v0.1 project itself.
 
-ChatGPT is the verified Chat AI path. The core Task/Result protocol, [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md), and [`CHAT_AI_EXECUTION.md`](CHAT_AI_EXECUTION.md) remain provider-neutral so Claude, Gemini, and other capable Chat AI environments can use the same contracts without changing the core executor.
+The core Task/Result protocol, [`setup/CHAT_AI_SETUP.md`](setup/CHAT_AI_SETUP.md), and [`CHAT_AI_EXECUTION.md`](CHAT_AI_EXECUTION.md) remain provider-neutral. Direct and Assisted transports reuse the same executor and contracts; Manual is the bounded fallback when the current Chat AI session cannot perform the required GitHub read/write operation directly.
 
 See [`RELEASE_NOTES.md`](RELEASE_NOTES.md) for the v0.1 release scope and execution boundary.
