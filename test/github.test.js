@@ -11,16 +11,18 @@ test.afterEach(() => {
   global.fetch = originalFetch;
 });
 
-test('resolveCommitSha maps missing ref to BASE_REF_NOT_FOUND', async () => {
-  global.fetch = async () => ({ ok: false, status: 404 });
+test('resolveCommitSha maps unresolved ref statuses to BASE_REF_NOT_FOUND', async () => {
+  for (const status of [404, 422]) {
+    global.fetch = async () => ({ ok: false, status });
 
-  await assert.rejects(
-    () => resolveCommitSha('token', 'owner/repo', 'missing-ref'),
-    (error) => error instanceof ProtocolError && error.code === 'BASE_REF_NOT_FOUND',
-  );
+    await assert.rejects(
+      () => resolveCommitSha('token', 'owner/repo', 'missing-ref'),
+      (error) => error instanceof ProtocolError && error.code === 'BASE_REF_NOT_FOUND',
+    );
+  }
 });
 
-test('resolveCommitSha preserves non-404 API failures as internal errors', async () => {
+test('resolveCommitSha preserves other API failures as internal errors', async () => {
   global.fetch = async () => ({ ok: false, status: 500 });
 
   await assert.rejects(
