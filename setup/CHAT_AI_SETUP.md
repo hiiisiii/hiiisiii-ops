@@ -65,9 +65,11 @@ Do not ask for information that can be discovered from the available GitHub or p
    - When multiple runners could otherwise match the workflow, use an explicit routing label if necessary to select only the intended restricted runner. A runner label is routing metadata, not a replacement for the trusted-actor gate.
 
 4. **Use the capabilities of the current Chat AI environment.**
-   - If you can read and modify the target GitHub repository directly, perform the required repository-side setup yourself.
-   - If a required action cannot be performed from the current Chat AI environment, give the user the smallest exact UI step or command needed.
-   - After the user performs that action, verify the resulting state before continuing.
+   - If you can read and modify the target GitHub repository directly, use Direct transport and perform the required repository-side setup yourself.
+   - If direct GitHub write is unavailable, prefer Assisted transport: prepare the exact prefilled Issue URL or ready-to-submit body and ask the user only to submit it as the configured trusted actor.
+   - If private result read/search is also unavailable, use Manual relay for the missing result step while preserving the same v1 request/result envelope.
+   - After any user-performed action, verify the resulting state before continuing.
+   - Do not assign a provider permanently to a transport mode; use observed current-session capabilities.
    - Do not claim a step is complete when you cannot verify it.
 
 5. **Do not reinstall existing tools without evidence that it is necessary.**
@@ -142,7 +144,7 @@ For the current v0.1 workflow, repository-side setup includes, when missing:
 
 If the current Chat AI can make the required changes directly, make them and verify them.
 
-If it cannot configure the repository Actions variable, runner routing, or another required GitHub setting, tell the user the smallest exact GitHub UI step or command needed and then verify the resulting state before moving on.
+If direct GitHub write is unavailable for task submission, use the Assisted prefilled-Issue path where possible. For repository settings that cannot be represented as a task Issue, such as the Actions variable or runner routing, tell the user the smallest exact GitHub UI step or command needed and then verify the resulting state before moving on.
 
 Do not automatically create OS accounts, change `sudoers`, move credentials, or register replacement runners merely because an existing runner fails the security boundary. Report **HOLD** with the minimum remediation. For v0.1, prefer a restricted runner account on the existing Linux host; use a dedicated isolated host/VM only when account-level isolation is insufficient.
 
@@ -150,7 +152,7 @@ Do not automatically create OS accounts, change `sudoers`, move credentials, or 
 
 Read and follow [`setup/HEALTH_CHECK.md`](HEALTH_CHECK.md).
 
-Use that canonical read-only Task Session to verify the actual Chat AI → GitHub → Actions → self-hosted runner → result path.
+Use that canonical read-only Task Session to verify the actual selected transport → GitHub → Actions → self-hosted runner → result path. Direct submission and Assisted prefilled-URL human submission are valid transport paths; if the Chat AI cannot read the private result, the user may relay the unchanged machine-readable result for Manual verification.
 
 The canonical health check proves connectivity and protocol execution. It does not by itself prove that the runner OS account or host is safely isolated, so the security boundary must already be verified as a setup precondition.
 
@@ -185,7 +187,7 @@ Use **HOLD** when, for example:
 
 - the target repository is unknown
 - the target repository is not private for the current v0.1 path
-- the current Chat AI cannot perform a required GitHub action and the user has not completed the required manual step
+- a required GitHub action cannot be completed through Direct or Assisted transport and the user has not completed the smallest required Manual step
 - `HIIISIII_TRUSTED_ACTOR` is missing or does not match the actor producing the task Issue event
 - no suitable runner is available to the target repository
 - the selected runner can gain root/privileged access non-interactively on a general-purpose host

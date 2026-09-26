@@ -24,7 +24,7 @@ The current v1 execution contract is verified for:
 - GitHub Actions
 - a self-hosted Linux runner
 - `target_id: "local"`
-- one GitHub Issue per task session
+- same-Issue task sessions plus verified branch+SHA cross-Issue continuation when transport requires a new Issue
 - `inspect`, `apply`, and `verify` operations
 
 Here, **Local** means that the self-hosted runner and the project execution environment are on the same machine. That machine may be a PC, server, or VM.
@@ -68,11 +68,23 @@ Typical uses:
 
 Do not automatically run a full repository build/test/lint suite, install dependencies, create tests, refactor unrelated code, or search for extra improvements unless the project's existing instructions or the actual requested change require it.
 
+## Select the transport from observed capabilities
+
+Use the least-manual transport that is actually available in the current Chat AI session. Do not choose a mode from the provider name or the model's self-description.
+
+- **Direct:** the Chat AI can create/update the GitHub Issue and read/search the matching result. Use the normal same-Issue sequence flow.
+- **Assisted:** direct Issue write is unavailable, but the Chat AI can prepare the exact task request as a prefilled Issue URL or equivalent ready-to-submit body. The user submits it while signed in as `HIIISIII_TRUSTED_ACTOR`. If the Chat AI can read/search the result afterward, continue directly from that evidence.
+- **Manual:** required GitHub write or result read/search is unavailable. The user relays the unchanged v1 request/result between GitHub and the Chat AI.
+
+The transport choice does not create a different protocol, executor, schema, or project-development policy.
+
 ## Task Session contract
 
-### One Issue = one user task session
+### Issue/session mapping
 
-Create one GitHub Issue for one logical user task. Reuse that Issue while iterating on the same task. Start a new Issue for a different user task.
+For Direct execution, create one GitHub Issue for one logical user task and reuse that Issue while iterating on the same task.
+
+When Assisted transport cannot update the existing Issue, a continuation request may use a new Issue with `sequence: 1` and inherit the previous verified state through the trusted result's `task_branch` + `head_sha`. Start a new unrelated state only for a different logical user task or when the user explicitly chooses a different base.
 
 The Issue title must begin with:
 
@@ -92,21 +104,24 @@ For the exact request fields and limits, follow [`contracts/task-v1.schema.json`
 
 ### Request identity and sequence
 
-For every new execution request in the same Issue:
+For every new execution request:
 
 - generate a new UUID `request_id`
 - keep `target_id` stable; the current verified target is `local`
-- keep the same logical task base
-- use `sequence: 1` for the first request
-- after a prior `success` or `failed` result, use one greater than the highest accepted sequence
-- a `rejected` request does not prove task execution and does not advance the accepted sequence
+- keep the same logical task base unless the user explicitly changes it
+- use `sequence: 1` for the first request in an Issue
+- for same-Issue continuation, after a prior `success` or `failed` result, use one greater than the highest accepted sequence
+- for cross-Issue Assisted continuation, start the new Issue at `sequence: 1` and pin the previous trusted state with `base_ref=<previous task_branch>` and `base_sha=<previous head_sha>`
+- a `rejected` request does not prove task execution and must not be used as the source state for automatic continuation
 - never reuse a `request_id`
 
-Do not publish the next request until the previous request's matching result is known.
+Do not publish the next request until the previous request's matching result is known. Prefer automatic cross-Issue continuation only from a trusted `success` result with a non-null `task_branch` and `head_sha`. A `failed` apply result may still contain an intended commit, but continuing from it requires an explicit evidence-based decision rather than automatic chaining.
 
 ### Base identity
 
-For the first request, resolve the actual intended `base_ref`. `base_sha` may be `null` when the task base has not yet been canonicalized by the executor.
+For a new task's first request, resolve the actual intended `base_ref`. `base_sha` may be `null` when the task base has not yet been canonicalized by the executor.
+
+For verified cross-Issue continuation, use the previous trusted result's deterministic `task_branch` as `base_ref` and its `head_sha` as `base_sha`. The branch provides source-state reachability and the SHA pins the expected state. If the source branch has moved, the request must fail stale-base validation; if the source ref cannot be resolved, the request must fail closed with a diagnostic result. Do not delete a source task branch before a required successor request has resolved it.
 
 After an accepted result returns a canonical `base_sha`, preserve that canonical base identity for subsequent requests in the same task. Do not silently switch the task to a newer branch head. If the protocol rejects a stale or mismatched base, diagnose from the returned evidence and issue only the smallest corrective request needed.
 
@@ -187,7 +202,7 @@ Never place passwords, PATs, API keys, SSH private keys, runner registration tok
 
 Do not ask the runner to discover or dump unrelated credentials or environment contents.
 
-If the current Chat AI cannot perform a required GitHub read/write operation, report **HOLD** and give the user only the smallest exact GitHub UI or CLI action needed. After the user performs it, verify the resulting state before continuing.
+If direct GitHub write is unavailable, use Assisted transport when the exact request can be prepared for trusted human submission. If result read/search is also unavailable, use Manual relay of the unchanged result. Report **HOLD** only when the required action or evidence cannot be completed or verified through Direct, Assisted, or Manual transport.
 
 Do not require Claude Code, Codex CLI, Gemini CLI, or another local AI coding agent as a hidden workaround.
 
