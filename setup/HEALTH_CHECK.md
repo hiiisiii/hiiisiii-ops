@@ -72,7 +72,15 @@ If a required precondition cannot be verified, report **HOLD** instead of runnin
 
 ## Canonical probe
 
-Create one dedicated GitHub Issue for the setup health check.
+Use one dedicated GitHub Issue for the setup health check.
+
+Choose the least-manual available submission path:
+
+- **Direct:** the Chat AI creates the Issue through its GitHub integration.
+- **Assisted:** the Chat AI prepares the exact prefilled Issue URL or ready-to-submit body and the user submits it while signed in as `HIIISIII_TRUSTED_ACTOR`.
+- **Manual:** use only when the current Chat AI cannot perform the required GitHub write/read operation; relay the unchanged request/result without changing the protocol envelope.
+
+The resulting Issue event actor must still match `HIIISIII_TRUSTED_ACTOR`.
 
 Recommended title:
 
@@ -123,14 +131,14 @@ Do not add extra commands merely because runner access is available.
 
 A successful probe provides evidence that:
 
-1. the current Chat AI can publish the required GitHub task request
+1. the required GitHub task request can be published through the selected Direct, Assisted, or Manual transport
 2. the Issue event reaches the configured hiiisiii workflow
 3. the `HIIISIII_TRUSTED_ACTOR` job-level gate allows the intended `github.actor`
 4. GitHub assigns the job to the intended self-hosted runner selected by the workflow routing
 5. the runner receives a validated checkout of the target repository
 6. the executor can run the read-only request
 7. the executor publishes a machine-readable result back to the same Issue
-8. the Chat AI can read the matching result and verify it
+8. the matching result can be returned to the Chat AI for verification, either by direct read/search or unchanged Manual relay
 
 This probe proves the execution path. It does not replace the separate OS-account/host isolation precondition.
 
