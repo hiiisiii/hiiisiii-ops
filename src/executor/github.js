@@ -1,7 +1,7 @@
 'use strict';
 
 const { execFileSync } = require('child_process');
-const { RESULT_BEGIN, RESULT_END } = require('./protocol');
+const { RESULT_BEGIN, RESULT_END, ProtocolError } = require('./protocol');
 
 function apiBase() {
   return process.env.GITHUB_API_URL || 'https://api.github.com';
@@ -41,6 +41,9 @@ async function listIssueComments(token, repository, issueNumber) {
 async function resolveCommitSha(token, repository, ref) {
   const encoded = encodeURIComponent(ref);
   const response = await fetch(`${apiBase()}/repos/${repository}/commits/${encoded}`, { headers: headers(token) });
+  if (response.status === 404) {
+    throw new ProtocolError('BASE_REF_NOT_FOUND', `base_ref does not resolve to a commit: ${ref}`);
+  }
   if (!response.ok) throw new Error(`GitHub commit resolve failed: ${response.status}`);
   const value = await response.json();
   if (!value || typeof value.sha !== 'string') throw new Error('GitHub commit resolve returned no SHA.');
