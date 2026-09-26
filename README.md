@@ -1,12 +1,29 @@
 # hiiisiii-ops
 
-Connect the Chat AI you already use to GitHub and your own execution environment through a self-hosted runner.
+Use the Chat AI you already use to do real project work in your own execution environment, with GitHub carrying the request and verified result.
+
+**v0.1 verified scope:** private GitHub project repositories + Linux self-hosted runner. Your normal Chat AI plan, message, and model usage still applies.
+
+Typical use cases:
+
+- ask your usual Chat AI to inspect, test, or change a project that actually runs on your own PC or server
+- keep using existing project rules such as `AGENTS.md` or `CLAUDE.md` instead of moving to a new prompt or development framework
+- use Direct GitHub integration when available, or the same Task/Result path through Assisted or Manual transport when it is not
+
+A normal request can look like this:
+
+```text
+You: Run the failing API test on the server, fix only what is needed, and show me the verified result.
+Chat AI → GitHub Issue → self-hosted runner → project work → GitHub result → Chat AI
+```
+
+[Start with Quick Start](#quick-start) · [Execution handoff](CHAT_AI_EXECUTION.md) · [Release scope](RELEASE_NOTES.md)
+
+**Not a good fit:** when the main requirement is a very fast interactive edit/run loop. hiiisiii-ops intentionally uses GitHub Issue/Actions round trips for execution and evidence.
 
 hiiisiii-ops is not a new IDE and does not require a separate local AI coding agent. The reasoning, planning, and code generation stay in ChatGPT, Claude, Gemini, or another supported chat AI environment. Your PC or server is used as the execution environment.
 
-> **Use the Chat AI you already have and the compute you already own.** hiiisiii-ops does not require a second local AI coding agent or a separate cloud execution worker, helping avoid unnecessary additional agent and hosted-compute usage. Your normal Chat AI plan, message, and model usage still applies.
-
-> **Status:** v0.1 Local/Linux release baseline is complete. The core Local task path has been validated end to end on a private repository with a Linux self-hosted runner, the Linux-first bootstrap/onboarding path is implemented, and the runner security boundary is documented. Runner isolation remains a per-deployment READY precondition for each user's execution environment; it is not a requirement that hiiisiii-ops centrally validate every user's machine before the project itself can be released.
+> **Status:** v0.1 Local/Linux release baseline is complete. Detailed verification status and security boundaries are documented below.
 
 ## How it works
 
