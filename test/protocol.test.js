@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const {
   REQUEST_BEGIN,
   REQUEST_END,
+  LIMITS,
   ProtocolError,
   parseRequestFromIssueBody,
   analyzeHistory,
@@ -53,6 +54,15 @@ test('rejects workdir traversal', () => {
 test('apply requires patch and inspect forbids patch', () => {
   assert.throws(() => parseRequestFromIssueBody(issueBody(task({ operation: 'apply' }))), (error) => error.code === 'PATCH_REQUIRED');
   assert.throws(() => parseRequestFromIssueBody(issueBody(task({ patch: 'x' }))), (error) => error.code === 'PATCH_NOT_ALLOWED');
+});
+
+
+test('oversized apply patch returns PATCH_TOO_LARGE', () => {
+  const patch = 'x'.repeat(LIMITS.maxPatchBytes + 1);
+  assert.throws(
+    () => parseRequestFromIssueBody(issueBody(task({ operation: 'apply', patch }))),
+    (error) => error.code === 'PATCH_TOO_LARGE',
+  );
 });
 
 test('duplicate request id is rejected', () => {
