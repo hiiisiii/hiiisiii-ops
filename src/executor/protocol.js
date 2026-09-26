@@ -142,7 +142,7 @@ function validateTask(task) {
       throw new ProtocolError('PATCH_REQUIRED', 'apply requires a non-empty patch.', recoverIdentity(task));
     }
     if (Buffer.byteLength(task.patch, 'utf8') > LIMITS.maxPatchBytes) {
-      throw new ProtocolError('PATCH_REJECTED', 'Patch exceeds hard byte limit.', recoverIdentity(task));
+      throw new ProtocolError('PATCH_TOO_LARGE', 'Patch exceeds hard byte limit.', recoverIdentity(task));
     }
   } else if (task.patch !== null) {
     throw new ProtocolError('PATCH_NOT_ALLOWED', `${task.operation} does not allow patch.`, recoverIdentity(task));
