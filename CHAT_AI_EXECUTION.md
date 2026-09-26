@@ -255,6 +255,18 @@ The executor owns the deterministic task-branch state. Do not directly modify th
 
 A successful patch application is not automatically enough to call the overall user task complete when runtime or project verification is materially required.
 
+#### Patch failure recovery
+
+When an `apply` request fails, use the returned `error_code` to choose the smallest corrective action:
+
+- `PATCH_INVALID`: regenerate a valid unified diff. Do not broaden inspection merely because the patch format was invalid.
+- `PATCH_UNSUPPORTED`: use a supported patch representation when possible. Rename/copy changes should be expressed with supported file changes; binary patch application is outside the current v1 path.
+- `PATCH_CONTEXT_MISMATCH`: re-read only the intended patch target file or files from the selected task state, then regenerate the patch against that state.
+- `PATCH_TOO_LARGE`: split the intended change into smaller bounded patches without expanding the user task.
+- `PATCH_REJECTED`: treat this as the remaining apply-integrity fallback. Do not blindly retry the same patch; inspect only the smallest evidence needed to determine whether a safe corrective request is possible, otherwise report HOLD.
+
+Do not add automatic retry, three-way patch application, or broad repository re-inspection merely because an apply request failed.
+
 ### `verify`
 
 Use `operation: "verify"` only when standalone verification is actually needed.
