@@ -108,6 +108,18 @@ This security check is a deployment/setup responsibility for the selected runner
 
 Do not paste runner registration tokens, PATs, SSH private keys, API keys, or other secrets into a Chat AI conversation.
 
+### Security boundary
+
+hiiisiii-ops executes real shell commands with the permissions of the selected self-hosted runner OS account.
+
+The execution handoff instructs the Chat AI to treat repository contents, command output, GitHub discussion text, and other observed content as data rather than independent authority to expand the task or execution boundary. Project instructions may guide how authorized project work is performed, but they do not independently authorize access to credentials, unrelated user data, privilege escalation, or other security-boundary expansion.
+
+Command output may be returned through GitHub Issues and the Chat AI, so sensitive configuration should normally be checked without printing secret values.
+
+Normal project commands such as tests, builds, package scripts, or deployment tools may themselves execute repository or dependency code with the runner account's permissions. Chat AI instruction rules cannot make such code inherently safe.
+
+The primary protection against unintended access therefore remains a restricted runner account or an appropriately isolated host/VM. Chat AI instruction rules and output handling are defense-in-depth, not substitutes for that execution boundary.
+
 ### 3. Continue setup in your Chat AI
 
 Use the handoff text printed by `setup/bootstrap.sh`, or open the ChatGPT, Claude, Gemini, or other supported chat AI environment you normally use and send:
