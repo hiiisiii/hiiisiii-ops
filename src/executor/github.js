@@ -41,7 +41,7 @@ async function listIssueComments(token, repository, issueNumber) {
 async function resolveCommitSha(token, repository, ref) {
   const encoded = encodeURIComponent(ref);
   const response = await fetch(`${apiBase()}/repos/${repository}/commits/${encoded}`, { headers: headers(token) });
-  if (response.status === 404) {
+  if (response.status === 404 || response.status === 422) {
     throw new ProtocolError('BASE_REF_NOT_FOUND', `base_ref does not resolve to a commit: ${ref}`);
   }
   if (!response.ok) throw new Error(`GitHub commit resolve failed: ${response.status}`);
