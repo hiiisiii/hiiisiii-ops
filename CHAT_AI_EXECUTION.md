@@ -31,6 +31,16 @@ Here, **Local** means that the self-hosted runner and the project execution envi
 
 Do not invent unsupported operations, fields, targets, or transport modes. Before executing work, use the target repository's installed hiiisiii workflow/schema as the compatibility boundary. The public execution handoff may live at a stable `main` path, while executable Actions remain pinned by immutable commit SHA in the target workflow.
 
+## Pull requests and external agent reviews
+
+Pull requests are not part of the default hiiisiii-ops execution path.
+
+- Do not create a pull request unless the user explicitly requests a PR for the current task.
+- Do not mark a PR ready for review, request reviewers, invoke `@codex review`, add an AI reviewer, or use another external AI/code-review action unless the user explicitly requests that review.
+- Do not enable auto-merge unless the user explicitly requests it and the project's existing rules allow it.
+- If a connected GitHub service can automatically invoke an AI reviewer when a PR exists, treat PR creation as a potentially agentic/billable side effect and avoid creating the PR by default.
+- Preserve work through the deterministic task branch, commit SHA, and trusted task result. A PR is not required to preserve or verify hiiisiii-ops task state.
+
 ## Instruction priority
 
 Use only the context needed for the current task.
